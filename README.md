@@ -20,3 +20,7 @@ Custom scripts for machine learning
 
 
 ### [Reddit - /r/datasets](https://www.reddit.com/r/datasets/)
+
+## Useful software
+
+### [labelImg](https://github.com/tzutalin/labelImg)
