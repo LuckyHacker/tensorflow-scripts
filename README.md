@@ -26,7 +26,7 @@ Custom scripts for machine learning
 
 ### [labelImg](https://github.com/tzutalin/labelImg)
 
-## Commands
+## Object detection commands
 ```
 # From tensorflow/models/
 protoc object_detection/protos/*.proto --python_out=.
