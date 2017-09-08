@@ -1,5 +1,6 @@
 # tensorflow-scripts
 Custom scripts for machine learning
+### [Tensorflow models repository](https://github.com/tensorflow/models)
 
 ## Useful datasets
 
