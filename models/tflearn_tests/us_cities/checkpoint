@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/onni/Desktop/tensorflow-scripts/models/tflearn/us_cities/model_us_cities-7290"
+all_model_checkpoint_paths: "/home/onni/Desktop/tensorflow-scripts/models/tflearn/us_cities/model_us_cities-7290"
