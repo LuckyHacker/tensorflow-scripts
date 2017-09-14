@@ -1,33 +1,40 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
+from collections import OrderedDict
 import requests
 import csv
+import time
 
 
 total_pages = 5858
 output_file = "output.csv"
 search_classes = ["address", "type", "size", "price", "year"]
 csv_column_names = ["city", "address", "type", "size", "price", "year"]
+url = "https://www.etuovi.com/myytavat-asunnot/tulokset?haku=M1142921947&page={}"
 
 with open(output_file, "w") as outfile:
     writer = csv.writer(outfile)
     writer.writerow(csv_column_names)
     for page_num in range(1, total_pages + 1):
+        page_load_begin = time.time()
+        dataset = OrderedDict(  [
+                                ("city", ([])),
+                                ("address", ([])),
+                                ("type", ([])),
+                                ("size", ([])),
+                                ("price", ([])),
+                                ("year", ([])),
+                                ]
+                                )
 
-        dataset = { "city": [],
-                    "address": [],
-                    "type": [],
-                    "size": [],
-                    "price": [],
-                    "year": [],
-                    }
 
-        print("Page: {}".format(page_num))
-        url = "https://www.etuovi.com/myytavat-asunnot/tulokset?haku=M1142921947&page={}".format(page_num)
-        r = requests.get(url)
+        r = requests.get(url.format(page_num))
+        page_load_end = round(time.time() - page_load_begin, 2)
+
+        page_parse_begin = time.time()
         soup = BeautifulSoup(r.text, 'html.parser')
         houses = soup.find_all('a', { "class" : "facts" })
-        
+
         for house in houses:
             divs = house.find_all('div')
             for div in divs:
@@ -55,3 +62,8 @@ with open(output_file, "w") as outfile:
                                 dataset["year"].append("")
 
         writer.writerows(zip(*dataset.values()))
+        page_parse_end = round(time.time() - page_parse_begin, 2)
+        print("Page {}, out of {}: Loaded in {}s, parsed in {}s".format(page_num,
+                                                                        total_pages,
+                                                                        page_load_end,
+                                                                        page_parse_end))
