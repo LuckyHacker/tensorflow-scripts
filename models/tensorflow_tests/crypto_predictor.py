@@ -4,10 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dataset = pd.read_csv('data/ETHUSD_TechnicalIndicators.csv')
+outfile = "prediction.png"
 datasetNorm = (dataset - dataset.mean()) / (dataset.max() - dataset.min())
 
 
-num_epochs = 100
+num_epochs = 10000
 batch_size = 1
 total_series_length = len(dataset.index)
 truncated_backprop_length = 3 #The size of the sequence
@@ -66,7 +67,7 @@ with tf.Session() as sess:
 
     for epoch_idx in range(num_epochs):
 
-        print('Epoch %d' %epoch_idx)
+        #print('Epoch %d' %epoch_idx)
 
         for batch_idx in range(num_batches):
             start_idx = batch_idx * truncated_backprop_length
@@ -115,4 +116,4 @@ plt.plot(yTest,label='Price',color='blue')
 plt.plot(test_pred_list,label='Predicted',color='red')
 plt.title('Price vs Predicted')
 plt.legend(loc='upper left')
-plt.savefig("prediction2.png")
+plt.savefig(outfile)
