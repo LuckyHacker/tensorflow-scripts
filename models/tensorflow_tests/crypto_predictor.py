@@ -3,13 +3,16 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-dataset = pd.read_csv('data/ETHUSD_TechnicalIndicators.csv')
-datasetNorm = (dataset - dataset.mean()) / (dataset.max() - dataset.min())
+outfile = "prediction.png"
+dataset = pd.read_csv('data/currency/ETHUSD_TechnicalIndicators.csv')
+datasetNorm = (dataset - dataset.min()) / (dataset.max() - dataset.min())
+
 
 
 num_epochs = 100
 batch_size = 1
-total_series_length = len(dataset.index)
+train_size = 0.9
+total_series_length = int(len(dataset.index) * train_size)
 truncated_backprop_length = 3 #The size of the sequence
 state_size = 12 #The number of neurons
 num_features = 4
@@ -20,14 +23,8 @@ print('The total series length is: %d' %total_series_length)
 print('The current configuration gives us %d batches of %d observations each one looking %d steps in the past'
       %(num_batches,batch_size,truncated_backprop_length))
 
-datasetTrain = datasetNorm[dataset.index < num_batches*batch_size*truncated_backprop_length]
-for i in range(min_test_size,len(datasetNorm.index)):
-
-    if(i % truncated_backprop_length*batch_size == 0):
-        test_first_idx = len(datasetNorm.index)-i
-        break
-
-datasetTest =  datasetNorm[dataset.index >= test_first_idx]
+datasetTrain = datasetNorm[dataset.index < total_series_length]
+datasetTest = datasetNorm[dataset.index >= total_series_length]
 
 xTrain = datasetTrain[['Price','MACD','Stochastics','ATR']].as_matrix()
 yTrain = datasetTrain['PriceTarget'].as_matrix()
@@ -61,13 +58,9 @@ loss_list = []
 test_pred_list = []
 
 with tf.Session() as sess:
-
     tf.global_variables_initializer().run()
-
     for epoch_idx in range(num_epochs):
-
         print('Epoch %d' %epoch_idx)
-
         for batch_idx in range(num_batches):
             start_idx = batch_idx * truncated_backprop_length
             end_idx = start_idx + truncated_backprop_length * batch_size
@@ -84,7 +77,7 @@ with tf.Session() as sess:
 
             #TRAIN!
             _loss,_train_step,_pred,_last_label,_prediction = sess.run(
-                fetches=[loss,train_step,prediction,last_label,prediction],
+                fetches=[loss, train_step, prediction, last_label, prediction],
                 feed_dict = feed
             )
 
@@ -93,20 +86,17 @@ with tf.Session() as sess:
                 print('Step %d - Loss: %.6f' %(batch_idx,_loss))
 
     #TEST
-
-
     for test_idx in range(len(xTest) - truncated_backprop_length):
 
-        testBatchX = xTest[test_idx:test_idx+truncated_backprop_length,:].reshape((1,truncated_backprop_length,num_features))
-        testBatchY = yTest[test_idx:test_idx+truncated_backprop_length].reshape((1,truncated_backprop_length,1))
-
+        testBatchX = xTest[test_idx:test_idx+truncated_backprop_length,:].reshape((1, truncated_backprop_length, num_features))
+        testBatchY = yTest[test_idx:test_idx+truncated_backprop_length].reshape((1, truncated_backprop_length, 1))
 
         #_current_state = np.zeros((batch_size,state_size))
         feed = {batchX_placeholder : testBatchX,
             batchY_placeholder : testBatchY}
 
         #Test_pred contains 'window_size' predictions, we want the last one
-        _last_state,_last_label,test_pred = sess.run([last_state,last_label,prediction],feed_dict=feed)
+        _last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
         test_pred_list.append(test_pred[-1][0]) #The last one
 
 
@@ -115,4 +105,4 @@ plt.plot(yTest,label='Price',color='blue')
 plt.plot(test_pred_list,label='Predicted',color='red')
 plt.title('Price vs Predicted')
 plt.legend(loc='upper left')
-plt.savefig("prediction2.png")
+plt.savefig(outfile)
