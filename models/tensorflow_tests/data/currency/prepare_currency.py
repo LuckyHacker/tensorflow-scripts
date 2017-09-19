@@ -3,8 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None
 
-currency_csv = "ETHUSD.csv"
-outfile = "ETHUSD_TechnicalIndicators.csv"
+currency_csv = "reversed_BTCUSD.csv"
+outfile = "BTCUSD_TechnicalIndicators2.csv"
 
 def MACD(df,period1,period2,periodSignal):
     EMA1 = pd.DataFrame.ewm(df,span=period1).mean()
