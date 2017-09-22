@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 outfile = "prediction.png"
-dataset = pd.read_csv('../data/currency/EURUSD_TechnicalIndicators.csv')
+dataset = pd.read_csv('../data/currency/ETHUSD_TechnicalIndicators.csv')
 datasetNorm = (dataset - dataset.min()) / (dataset.max() - dataset.min())
 
 

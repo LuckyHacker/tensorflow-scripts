@@ -3,8 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None
 
-currency_csv = "reversed_ETHUSD.csv"
-outfile = "ETHUSD_alltargets.csv"
+stock_csv = "TSLA.csv"
+outfile = "TSLA_TechnicalIndicators.csv"
 
 def MACD(df,period1,period2,periodSignal):
     EMA1 = pd.DataFrame.ewm(df,span=period1).mean()
@@ -24,24 +24,16 @@ def ATR(df,period):
     Method A: Current High less the current Low
     '''
     df['H-L'] = abs(df['High']-df['Low'])
-    df['H-PC'] = abs(df['High']-df['Price'].shift(1))
-    df['L-PC'] = abs(df['Low']-df['Price'].shift(1))
+    df['H-PC'] = abs(df['High']-df['Close'].shift(1))
+    df['L-PC'] = abs(df['Low']-df['Close'].shift(1))
     TR = df[['H-L','H-PC','L-PC']].max(axis=1)
     return TR.to_frame()
 
 
-df = pd.read_csv(currency_csv, usecols=[1,2,3,4])
-df = df.iloc[::-1]
-"""
-df["Price"] = (df["Price"].str.split()).apply(lambda x: float(x[0].replace(',', '')))
-df["Open"] = (df["Open"].str.split()).apply(lambda x: float(x[0].replace(',', '')))
-df["High"] = (df["High"].str.split()).apply(lambda x: float(x[0].replace(',', '')))
-df["Low"] = (df["Low"].str.split()).apply(lambda x: float(x[0].replace(',', '')))
-"""
+df = pd.read_csv(stock_csv, usecols=[1,2,3,4])
 
-dfPrices = pd.read_csv(currency_csv,usecols=[1])
-dfPrices = dfPrices.iloc[::-1]
-#dfPrices["Price"] = (dfPrices["Price"].str.split()).apply(lambda x: float(x[0].replace(',', '')))
+
+dfPrices = df['Close']
 
 price = dfPrices.iloc[len(dfPrices.index)-60:len(dfPrices.index)].as_matrix().ravel()
 prices = dfPrices.iloc[len(dfPrices.index)-60:len(dfPrices.index)].as_matrix().ravel()
