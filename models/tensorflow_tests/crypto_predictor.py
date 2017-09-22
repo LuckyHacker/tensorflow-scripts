@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 outfile = "prediction.png"
-dataset = pd.read_csv('../data/currency/ETHUSD_TechnicalIndicators.csv')
+dataset = pd.read_csv('../data/currency/EURUSD_TechnicalIndicators.csv')
 datasetNorm = (dataset - dataset.min()) / (dataset.max() - dataset.min())
 
 
@@ -26,10 +26,10 @@ print('The current configuration gives us %d batches of %d observations each one
 datasetTrain = datasetNorm[dataset.index < total_series_length]
 datasetTest = datasetNorm[dataset.index >= total_series_length]
 
-xTrain = datasetTrain[['Price','MACD','Stochastics','ATR']].as_matrix()
-yTrain = datasetTrain['PriceTarget'].as_matrix()
-xTest = datasetTest[['Price','MACD','Stochastics','ATR']].as_matrix()
-yTest = datasetTest['PriceTarget'].as_matrix()
+xTrain = datasetTrain[['Close','MACD','Stochastics','ATR']].as_matrix()
+yTrain = datasetTrain['CloseTarget'].as_matrix()
+xTest = datasetTest[['Close','MACD','Stochastics','ATR']].as_matrix()
+yTest = datasetTest['CloseTarget'].as_matrix()
 
 batchX_placeholder = tf.placeholder(dtype=tf.float32,shape=[None,truncated_backprop_length,num_features],name='data_ph')
 batchY_placeholder = tf.placeholder(dtype=tf.float32,shape=[None,truncated_backprop_length,num_classes],name='target_ph')

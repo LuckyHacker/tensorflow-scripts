@@ -21,10 +21,10 @@ datasetTrain = dataset_norm[dataset.index < train_length]
 datasetTest = dataset_norm[dataset.index >= train_length]
 
 # csv to numpy array
-xTrain = datasetTrain[['Price','MACD','Stochastics','ATR']].as_matrix()
-yTrain = datasetTrain['PriceTarget'].as_matrix()
-xTest = datasetTest[['Price','MACD','Stochastics','ATR']].as_matrix()
-yTest = datasetTest['PriceTarget'].as_matrix()
+xTrain = datasetTrain[['Close','MACD','Stochastics','ATR']].as_matrix()
+yTrain = datasetTrain['CloseTarget'].as_matrix()
+xTest = datasetTest[['Close','MACD','Stochastics','ATR']].as_matrix()
+yTest = datasetTest['CloseTarget'].as_matrix()
 
 # Reshape data
 xTrain = xTrain.reshape([len(xTrain), num_features])

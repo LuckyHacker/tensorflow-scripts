@@ -6,12 +6,13 @@ import matplotlib.pyplot as plt
 
 
  # Read and normalize data
-dataset = pd.read_csv('data/ETHUSD_TechnicalIndicators.csv')
-dataset = (dataset - dataset.mean()) / (dataset.max() - dataset.min())
+outfile = "prediction2.png"
+dataset = pd.read_csv('../data/currency/EURUSD_TechnicalIndicators.csv')
+dataset = (dataset - dataset.min()) / (dataset.max() - dataset.min())
 
 
 # Hyperparams
-num_epochs = 1000
+num_epochs = 100
 batch_size = 1
 total_series_length = len(dataset.index)
 truncated_backprop_length = 3 #The size of the sequence
@@ -140,4 +141,4 @@ plt.plot(_y,label='Price',color='blue')
 plt.plot(_pred.ravel(),label='Predicted',color='red')
 plt.title('Price vs Predicted')
 plt.legend(loc='upper left')
-plt.savefig("prediction.png")
+plt.savefig(outfile)
