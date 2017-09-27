@@ -12,10 +12,10 @@ infile = "TSLA_alltargets.csv"
 infolder = "stock"
 
 learning_rate = 0.001
-num_epochs = 100
+num_epochs = 300
 batch_size = 1
 train_size = 0.9
-truncated_backprop_length = 1
+truncated_backprop_length = 3
 state_size = 12
 num_features = 4
 num_classes = 4
@@ -115,14 +115,19 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             if test_idx == 0:
                 testBatchX = xTest[test_idx:test_idx+truncated_backprop_length,:].reshape((1, truncated_backprop_length, num_features))
                 testBatchY = yTest[test_idx:test_idx+truncated_backprop_length].reshape((1, truncated_backprop_length, num_classes))
+                testBatchX = testBatchX.tolist()
+                testBatchY = testBatchY.tolist()
+                test_days_pred_list.append(testBatchY[0][-1][0])
             else:
-                testBatchX = test_pred.reshape([1, truncated_backprop_length, num_features])
-                testBatchY = test_pred[0].reshape([1, truncated_backprop_length, num_classes])
+                test_pred = test_pred[0].tolist()
+                testBatchX[0].append(test_pred)
+                testBatchX[0].pop(0)
+                testBatchY = testBatchX
 
-            feed = {batchX_placeholder : testBatchX,
-                    batchY_placeholder : testBatchY}
+            feed = {batchX_placeholder : testBatchX}
 
-            _last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
+            #_last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
+            test_pred = prediction.eval(feed_dict=feed)
             test_days_pred_list.append(test_pred[-1][0])
 
         # Test per day
