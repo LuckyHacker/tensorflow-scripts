@@ -8,18 +8,17 @@ import os
 outfile = "prediction.png"
 outfolder = "output"
 #infile = "ETHUSD_OHLC_alltargets.csv"
-infile = "TSLA_alltargets.csv"
+infile = "KNYJF_alltargets.csv"
 infolder = "stock"
 
 learning_rate = 0.001
-num_epochs = 300
+num_epochs = 100
 batch_size = 1
 train_size = 0.9
 truncated_backprop_length = 3
 state_size = 12
 num_features = 4
 num_classes = 4
-min_test_size = 100
 
 
 dataset = pd.read_csv('../data/{}/{}'.format(infolder, infile))
@@ -114,20 +113,13 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
         for test_idx in range(len(xTest) - truncated_backprop_length):
             if test_idx == 0:
                 testBatchX = xTest[test_idx:test_idx+truncated_backprop_length,:].reshape((1, truncated_backprop_length, num_features))
-                testBatchY = yTest[test_idx:test_idx+truncated_backprop_length].reshape((1, truncated_backprop_length, num_classes))
                 testBatchX = testBatchX.tolist()
-                testBatchY = testBatchY.tolist()
-                test_days_pred_list.append(testBatchY[0][-1][0])
             else:
                 test_pred = test_pred[0].tolist()
                 testBatchX[0].append(test_pred)
                 testBatchX[0].pop(0)
-                testBatchY = testBatchX
 
-            feed = {batchX_placeholder : testBatchX}
-
-            #_last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
-            test_pred = prediction.eval(feed_dict=feed)
+            test_pred = prediction.eval(feed_dict={batchX_placeholder : testBatchX})
             test_days_pred_list.append(test_pred[-1][0])
 
         # Test per day
@@ -159,6 +151,11 @@ def plot_prediction(day, days, test_prices):
     ax2.plot(test_prices, label='Price', color='blue')
     ax2.plot(days, label='Predicted', color='red')
     ax2.legend(loc='upper left')
+
+    plt.figtext(0.01, 0.5, """Learning Rate = {}\nEpochs = {}\nBatch Size = {}\nTrain Size = {}\nTruncated Backprop = {}\nState Size = {}""".format(
+                        learning_rate, num_epochs, batch_size, train_size,
+                        truncated_backprop_length, state_size), bbox={'facecolor': 'darkblue', 'alpha': 0.5, 'pad': 10},
+                        fontsize=11)
 
     plt.savefig(os.path.join(outfolder, outfile))
     plt.show()
