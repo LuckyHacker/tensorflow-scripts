@@ -26,6 +26,10 @@ Custom scripts for machine learning
 
 ### [labelImg](https://github.com/tzutalin/labelImg)
 
+## Articles
+
+### [Understanding LSTM networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+
 ## Object detection commands
 ```
 # From tensorflow/models/
