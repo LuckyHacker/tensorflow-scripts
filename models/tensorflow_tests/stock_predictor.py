@@ -7,7 +7,6 @@ import os
 
 outfile = "prediction.png"
 outfolder = "output"
-#infile = "ETHUSD_OHLC_alltargets.csv"
 infile = "KNYJF_alltargets.csv"
 infolder = "stock"
 
@@ -62,7 +61,7 @@ def model():
     b2 = tf.Variable(   initial_value=np.random.rand(1, num_classes),
                         dtype=tf.float32)
     labels_series = tf.unstack(batchY_placeholder, axis=1)
-    cell = tf.contrib.rnn.BasicRNNCell(num_units=state_size)
+    cell = tf.contrib.rnn.LSTMCell(num_units=state_size)
     states_series, current_state = tf.nn.dynamic_rnn(   cell=cell,
                                                         inputs=batchX_placeholder,
                                                         dtype=tf.float32)
