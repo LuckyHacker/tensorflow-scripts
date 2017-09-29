@@ -3,8 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None
 
-stock_csv = "KNYJF.csv"
-outfile = "KNYJF_TechnicalIndicators.csv"
+stock_csv = "GOOG.csv"
+outfile = "GOOG_TechnicalIndicators.csv"
 
 def MACD(df,period1,period2,periodSignal):
     EMA1 = pd.DataFrame.ewm(df,span=period1).mean()

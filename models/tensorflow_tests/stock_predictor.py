@@ -4,11 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-
 outfile = "prediction.png"
 outfolder = "output"
-infile = "KNYJF_alltargets.csv"
-infolder = "stock"
+infile = "GOOG_alltargets.csv"
+infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
 num_epochs = 100
