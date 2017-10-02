@@ -6,7 +6,7 @@ import os
 
 outfile = "prediction.png"
 outfolder = "output"
-infile = "KNYJF_alltargets.csv"
+infile = "GOOG_alltargets.csv"
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
@@ -49,7 +49,7 @@ def prepare_data():
     return xTrain, xTest, yTrain, yTest, test_prices
 
 
-def model(nn_mode="lstm"):
+def model():
     batchX_placeholder = tf.placeholder(dtype=tf.float32,
                                         shape=[None, truncated_backprop_length, num_features],
                                         name='data_ph')
@@ -61,12 +61,7 @@ def model(nn_mode="lstm"):
     b2 = tf.Variable(   initial_value=np.random.rand(1, num_classes),
                         dtype=tf.float32)
     labels_series = tf.unstack(batchY_placeholder, axis=1)
-
-    if nn_mode == "lstm":
-        cell = tf.contrib.rnn.LSTMCell(num_units=state_size)
-    elif nn_mode == "rnn":
-        cell = tf.contrib.rnn.BasicRNNCell(num_units=state_size)
-
+    cell = tf.contrib.rnn.LSTMCell(num_units=state_size)
     states_series, current_state = tf.nn.dynamic_rnn(   cell=cell,
                                                         inputs=batchX_placeholder,
                                                         dtype=tf.float32)
@@ -130,7 +125,7 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             test_pred = prediction.eval(feed_dict={batchX_placeholder : testBatchX})
             test_days_pred_list.append(test_pred[-1][0])
 
-            test_days_differences.append(abs(testBatchY[0][-1][0] - test_days_pred_list[-1]))
+            test_days_differences.append(testBatchY[0][-1][0] - test_days_pred_list[-1])
 
         # Test per day
         for test_idx in range(len(xTest) - truncated_backprop_length):
@@ -143,7 +138,7 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             _last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
             test_day_pred_list.append(test_pred[-1][0])
 
-            test_day_differences.append(abs(testBatchY[0][-1][0] - test_day_pred_list[-1]))
+            test_day_differences.append(testBatchY[0][-1][0] - test_day_pred_list[-1])
 
     return test_day_pred_list, test_days_pred_list, test_day_differences, test_days_differences
 
@@ -154,8 +149,8 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences):
     ax1 = fig.add_subplot(1, 2, 1)
     ax2 = fig.add_subplot(1, 2, 2)
 
-    day_price_error = sum(day_differences) / len(day_differences) * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
-    days_price_error = sum(days_differences) / len(days_differences) * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
+    day_price_error = sum(day_differences) / len(day_differences) * (dataset["Close"].max() - dataset["Close"].min())
+    days_price_error = sum(days_differences) / len(days_differences) * (dataset["Close"].max() - dataset["Close"].min())
 
     ax1.set_xlabel("Days")
     ax1.set_ylabel("Price")
@@ -181,13 +176,44 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences):
     ax2.plot(days, label='Predicted', color='red')
     ax2.legend(loc='upper left')
 
-    plt.figtext(0.005, 0.5, """Learning Rate = {}\nEpochs = {}\nBatch Size = {}\nTrain Size = {}\nTruncated Backprop = {}\nState Size = {}""".format(
+    plt.figtext(0.005, 0.8, """Learning Rate = {}\nEpochs = {}\nBatch Size = {}\nTrain Size = {}\nTruncated Backprop = {}\nState Size = {}""".format(
                         learning_rate, num_epochs, batch_size, train_size,
                         truncated_backprop_length, state_size), bbox={'facecolor': 'darkblue', 'alpha': 0.5, 'pad': 10},
                         fontsize=11)
 
     plt.savefig(os.path.join(outfolder, outfile))
     plt.show()
+
+def norm_to_original(scalar):
+    return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
+
+def calculate_profit(day_diff, test_prices):
+    starting_money = 5000
+    current_money = starting_money
+    current_price = norm_to_original(test_prices[0])
+    num_shares = starting_money/ current_price
+
+    for count, d in enumerate(day_diff):
+        current_price = norm_to_original(test_prices[count])
+        if d < 0 and num_shares > 0:
+            print("Selling")
+            current_money = num_shares * current_price
+            num_shares = 0
+        elif d > 0 and num_shares == 0:
+            print("Buying")
+            num_shares = current_money / current_price
+            current_money = 0
+        else:
+            print("Idle")
+
+        total_worth = current_money + (num_shares * current_price)
+        total_profit = total_worth / starting_money * 100 - 100
+        print("Current price: {}\nCurrent money: {}\nCurrent shares: {}\nTotal worth: {}\nTotal profit: {} %".format(int(current_price), int(current_money), int(num_shares), int(total_worth), int(total_profit)))
+        print("")
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -198,4 +224,5 @@ if __name__ == "__main__":
                                 placeholder_x, placeholder_y,
                                 trainX, testX, trainY, testY)
 
+    calculate_profit(test_day_differences, prices)
     plot_prediction(day, days, prices, test_day_differences, test_days_differences)
