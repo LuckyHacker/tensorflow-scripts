@@ -6,11 +6,11 @@ import os
 
 outfile = "prediction.png"
 outfolder = "output"
-infile = "GOOG_alltargets.csv"
+infile = "KNYJF_alltargets.csv"
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
-num_epochs = 100
+num_epochs = 10
 batch_size = 1
 train_size = 0.9
 truncated_backprop_length = 3
@@ -138,7 +138,8 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             _last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
             test_day_pred_list.append(test_pred[-1][0])
 
-            test_day_differences.append(testBatchY[0][-1][0] - test_day_pred_list[-1])
+            if test_idx > 0:
+                test_day_differences.append(yTest[test_idx - 1][0] - test_day_pred_list[-1])
 
     return test_day_pred_list, test_days_pred_list, test_day_differences, test_days_differences
 
@@ -191,7 +192,7 @@ def calculate_profit(day_diff, test_prices):
     starting_money = 5000
     current_money = starting_money
     current_price = norm_to_original(test_prices[0])
-    num_shares = starting_money/ current_price
+    num_shares = starting_money / current_price
 
     for count, d in enumerate(day_diff):
         current_price = norm_to_original(test_prices[count])
