@@ -10,10 +10,10 @@ infile = "KNYJF_alltargets.csv"
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
-num_epochs = 10
+num_epochs = 30
 batch_size = 1
 train_size = 0.9
-truncated_backprop_length = 3
+truncated_backprop_length = 1
 state_size = 12
 num_features = 4
 num_classes = 4
@@ -125,7 +125,8 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             test_pred = prediction.eval(feed_dict={batchX_placeholder : testBatchX})
             test_days_pred_list.append(test_pred[-1][0])
 
-            test_days_differences.append(testBatchY[0][-1][0] - test_days_pred_list[-1])
+            if test_idx > 0:
+                test_days_differences.append(test_days_pred_list[-1] - yTest[test_idx - 1][0])
 
         # Test per day
         for test_idx in range(len(xTest) - truncated_backprop_length):
@@ -138,8 +139,10 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             _last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
             test_day_pred_list.append(test_pred[-1][0])
 
+            if test_idx == 0:
+                test_day_differences.append(0)
             if test_idx > 0:
-                test_day_differences.append(yTest[test_idx - 1][0] - test_day_pred_list[-1])
+                test_day_differences.append(test_day_pred_list[-1] - test_day_pred_list[-2])
 
     return test_day_pred_list, test_days_pred_list, test_day_differences, test_days_differences
 
@@ -190,27 +193,62 @@ def norm_to_original(scalar):
 
 def calculate_profit(day_diff, test_prices):
     starting_money = 5000
+    trading_fee = 0.002
+    min_fee = 9
+    num_shares = 0
+    req_diff = 0.01
+
+    total_paid_fee = 0
+    best_profit = 0
+    worst_profit = 0
+    fee_amount = 0
+    trading_fee_ratio = 1 - trading_fee
     current_money = starting_money
-    current_price = norm_to_original(test_prices[0])
-    num_shares = starting_money / current_price
 
     for count, d in enumerate(day_diff):
         current_price = norm_to_original(test_prices[count])
-        if d < 0 and num_shares > 0:
+        print(d)
+        if d < -req_diff and num_shares > 0:
             print("Selling")
-            current_money = num_shares * current_price
+            fee_amount = num_shares * current_price * trading_fee
+            if fee_amount < min_fee:
+                fee_amount = min_fee
+            current_money = num_shares * current_price - fee_amount
+            total_paid_fee += fee_amount
             num_shares = 0
-        elif d > 0 and num_shares == 0:
+        elif d > req_diff and num_shares == 0:
             print("Buying")
-            num_shares = current_money / current_price
+            fee_amount = current_money * trading_fee
+            if fee_amount < min_fee:
+                fee_amount = min_fee
+            total_paid_fee += fee_amount
+            num_shares = (current_money - fee_amount) / current_price
             current_money = 0
         else:
             print("Idle")
 
         total_worth = current_money + (num_shares * current_price)
         total_profit = total_worth / starting_money * 100 - 100
-        print("Current price: {}\nCurrent money: {}\nCurrent shares: {}\nTotal worth: {}\nTotal profit: {} %".format(int(current_price), int(current_money), int(num_shares), int(total_worth), int(total_profit)))
+        if total_profit > best_profit:
+            best_profit = total_profit
+
+        if total_profit < worst_profit:
+            worst_profit = total_profit
+
+        print("Current price: {}\nCurrent money: {}\nCurrent shares: {}\nTrading fee: {}\nTotal worth: {}\nTotal profit: {} %".format(
+            round(current_price),
+            round(current_money),
+            round(num_shares),
+            round(fee_amount),
+            round(total_worth),
+            round(total_profit)))
         print("")
+
+    print("Total paid fee: {}\nBest profit: {} %\nWorst profit: {} %\nTotal money earned: {}".format(
+        total_paid_fee,
+        best_profit,
+        worst_profit,
+        total_worth - starting_money))
 
 
 
