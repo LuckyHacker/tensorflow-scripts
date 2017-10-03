@@ -2,18 +2,19 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import os
 
 outfile = "prediction.png"
 outfolder = "output"
-infile = "TOKMAN.HE_alltargets.csv"
+infile = "ABT_alltargets.csv"
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
 num_epochs = 10
 batch_size = 1
 train_size = 0.9
-truncated_backprop_length = 3
+truncated_backprop_length = 1
 state_size = 12
 num_features = 4
 num_classes = 4
@@ -145,11 +146,14 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
     return test_day_pred_list, test_days_pred_list, test_day_differences, test_days_differences
 
 
-def plot_prediction(day, days, test_prices, day_differences, days_differences):
-    fig = plt.figure(num=None, figsize=(22, 10), dpi=80, facecolor="white")
+def plot_prediction(day, days, test_prices, day_differences, days_differences, buy_list, sell_list):
+    fig = plt.figure(num=None, figsize=(22, 12), dpi=80, facecolor="white")
     fig.canvas.set_window_title("Stock prediction {}".format(infile))
-    ax1 = fig.add_subplot(1, 2, 1)
-    ax2 = fig.add_subplot(1, 2, 2)
+    gs = gridspec.GridSpec(2, 2)
+    ax1 = plt.subplot(gs[0])
+    ax2 = plt.subplot(gs[1])
+    ax3 = plt.subplot(gs[2])
+    ax4 = plt.subplot(gs[3])
 
     day_price_error = sum(day_differences) / len(day_differences) * (dataset["Close"].max() - dataset["Close"].min())
     days_price_error = sum(days_differences) / len(days_differences) * (dataset["Close"].max() - dataset["Close"].min())
@@ -163,7 +167,7 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences):
                     verticalalignment='center',
                     transform=ax1.transAxes)
     ax1.plot(test_prices, label='Price', color='blue')
-    ax1.plot(day, label='Predicted',color='red')
+    ax1.plot(day, label='Predicted', color='red')
     ax1.legend(loc='upper left')
 
     ax2.set_xlabel("Days")
@@ -178,6 +182,13 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences):
     ax2.plot(days, label='Predicted', color='red')
     ax2.legend(loc='upper left')
 
+    ax3.set_xlabel("Days")
+    ax3.set_ylabel("Price (buy/sell)")
+    ax3.set_title("Virtual money simulation")
+    ax3.plot(test_prices, label='Price', color='blue', markevery=sell_list, markerfacecolor="red", markeredgecolor="red", marker="o")
+    ax3.plot(test_prices, color='blue', markevery=buy_list, markerfacecolor="green", markeredgecolor="green", marker="o")
+    ax3.legend(loc='upper left')
+
     plt.figtext(0.005, 0.8, """Learning Rate = {}\nEpochs = {}\nBatch Size = {}\nTrain Size = {}\nTruncated Backprop = {}\nState Size = {}""".format(
                         learning_rate, num_epochs, batch_size, train_size,
                         truncated_backprop_length, state_size), bbox={'facecolor': 'darkblue', 'alpha': 0.5, 'pad': 10},
@@ -189,8 +200,8 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences):
 def norm_to_original(scalar):
     return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
 
-def calculate_profit(day_diff, test_prices):
-    starting_money = 1500
+def simulate_profit(day_diff, test_prices):
+    starting_money = 5000
     trading_fee = 0.002
     min_fee = 9
     num_shares = 0
@@ -203,12 +214,15 @@ def calculate_profit(day_diff, test_prices):
     trading_fee_ratio = 1 - trading_fee
     current_money = starting_money
 
+    buy_list = []
+    sell_list = []
     for count, d in enumerate(day_diff):
         current_price = norm_to_original(test_prices[count])
         print("Day {}".format(count + 1))
         print("Diff: {}".format(d))
         if d < -req_diff and num_shares > 0:
             print("State: Selling")
+            sell_list.append(count)
             fee_amount = num_shares * current_price * trading_fee
             if fee_amount < min_fee:
                 fee_amount = min_fee
@@ -217,6 +231,7 @@ def calculate_profit(day_diff, test_prices):
             num_shares = 0
         elif d > req_diff and num_shares == 0:
             print("State: Buying")
+            buy_list.append(count)
             fee_amount = current_money * trading_fee
             if fee_amount < min_fee:
                 fee_amount = min_fee
@@ -249,10 +264,7 @@ def calculate_profit(day_diff, test_prices):
         worst_profit,
         total_worth - starting_money))
 
-
-
-
-
+    return buy_list, sell_list
 
 if __name__ == "__main__":
     outfile = infile.split(".")[0] + "_" + outfile
@@ -262,5 +274,5 @@ if __name__ == "__main__":
                                 placeholder_x, placeholder_y,
                                 trainX, testX, trainY, testY)
 
-    calculate_profit(test_day_differences, prices)
-    plot_prediction(day, days, prices, test_day_differences, test_days_differences)
+    buy_list, sell_list = simulate_profit(test_day_differences, prices)
+    plot_prediction(day, days, prices, test_day_differences, test_days_differences, buy_list, sell_list)
