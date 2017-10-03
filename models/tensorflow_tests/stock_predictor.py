@@ -10,7 +10,7 @@ infile = "KNYJF_alltargets.csv"
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
-num_epochs = 30
+num_epochs = 10
 batch_size = 1
 train_size = 0.9
 truncated_backprop_length = 1
@@ -89,7 +89,7 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
     with tf.Session() as sess:
         tf.global_variables_initializer().run()
         print('Train data length: %d' % train_length)
-        print('Test data length: %d' % test_length)
+        print('Test data length: %d' % (test_length+1))
         _loss = 0
 
         # Train
@@ -129,7 +129,7 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
                 test_days_differences.append(test_days_pred_list[-1] - yTest[test_idx - 1][0])
 
         # Test per day
-        for test_idx in range(len(xTest) - truncated_backprop_length):
+        for test_idx in range(len(xTest)):
             testBatchX = xTest[test_idx:test_idx+truncated_backprop_length,:].reshape((1, truncated_backprop_length, num_features))
             testBatchY = yTest[test_idx:test_idx+truncated_backprop_length].reshape((1, truncated_backprop_length, num_classes))
 
@@ -139,8 +139,6 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             _last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
             test_day_pred_list.append(test_pred[-1][0])
 
-            if test_idx == 0:
-                test_day_differences.append(0)
             if test_idx > 0:
                 test_day_differences.append(test_day_pred_list[-1] - test_day_pred_list[-2])
 
@@ -207,9 +205,10 @@ def calculate_profit(day_diff, test_prices):
 
     for count, d in enumerate(day_diff):
         current_price = norm_to_original(test_prices[count])
-        print(d)
+        print("Day {}".format(count + 1))
+        print("Diff: {}".format(d))
         if d < -req_diff and num_shares > 0:
-            print("Selling")
+            print("State: Selling")
             fee_amount = num_shares * current_price * trading_fee
             if fee_amount < min_fee:
                 fee_amount = min_fee
@@ -217,7 +216,7 @@ def calculate_profit(day_diff, test_prices):
             total_paid_fee += fee_amount
             num_shares = 0
         elif d > req_diff and num_shares == 0:
-            print("Buying")
+            print("State: Buying")
             fee_amount = current_money * trading_fee
             if fee_amount < min_fee:
                 fee_amount = min_fee
@@ -225,7 +224,7 @@ def calculate_profit(day_diff, test_prices):
             num_shares = (current_money - fee_amount) / current_price
             current_money = 0
         else:
-            print("Idle")
+            print("State: Idle")
 
         total_worth = current_money + (num_shares * current_price)
         total_profit = total_worth / starting_money * 100 - 100
