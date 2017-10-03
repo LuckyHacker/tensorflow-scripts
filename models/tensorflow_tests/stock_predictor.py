@@ -6,14 +6,14 @@ import os
 
 outfile = "prediction.png"
 outfolder = "output"
-infile = "KNYJF_alltargets.csv"
+infile = "TOKMAN.HE_alltargets.csv"
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
 num_epochs = 10
 batch_size = 1
 train_size = 0.9
-truncated_backprop_length = 1
+truncated_backprop_length = 3
 state_size = 12
 num_features = 4
 num_classes = 4
@@ -190,7 +190,7 @@ def norm_to_original(scalar):
     return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
 
 def calculate_profit(day_diff, test_prices):
-    starting_money = 5000
+    starting_money = 1500
     trading_fee = 0.002
     min_fee = 9
     num_shares = 0
