@@ -66,7 +66,7 @@ For example if price is 50 today and we own 100 shares, then total value is 5000
 The point is, if we have any clue about in which direction prices will be going, we can act before it happens. We do not necessarily need to know the exact prices if we know direction.
 
 ## Virtual trading simulation
-***Simulation probably contains bugs and missing features***
+***Simulation probably contains bugs and is missing features***
 
 ![Simulation](images/simulation_graph.png)
 
