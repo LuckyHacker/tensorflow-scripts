@@ -186,7 +186,7 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences,
 
     ax3.set_xlabel("Days")
     ax3.set_ylabel("Price")
-    ax3.set_title("Virtual money simulation")
+    ax3.set_title("Virtual trading simulation")
     ax3.plot(test_prices, label='Price (buy/sell)', color='blue', markevery=sell_list, markerfacecolor="red", markeredgecolor="red", marker="o")
     ax3.plot(test_prices, color='blue', markevery=buy_list, markerfacecolor="green", markeredgecolor="green", marker="o")
     ax3.legend(loc='upper left')
