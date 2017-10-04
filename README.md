@@ -76,7 +76,7 @@ In above graph we have points where AI decided to buy (green) and to sell (red),
 
 ![Trading fee](images/trading_fee.png)
 
-If we use low starting money in daily trading, trading fees will be too much because of the minimum fee and it will eat up our money. Above graph suggests we should have at least 200€ for starting to not lose and not gain any money.
+If we use low starting money in daily trading, trading fees will be too much because of the minimum fee and it will eat up our investments. Above graph suggests we should have at least 200€ for starting to not lose and not gain any money.
 
 If trading fee is 0.06% and minimum fee is 3€, we should have 3€ / (0.06% / 100) = 5000€ for most optimal profit. If we have trading fee of 0.2% and minimum fee of 9€, then we should have 9€ / (0.2% / 100) = 4500€ for most optimal profit. These are actual trading fees from [Nordnet](https://www.nordnet.fi/palvelut-ja-tuotteet/hinnasto.html).
 
