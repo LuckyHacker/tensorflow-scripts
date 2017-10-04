@@ -9,6 +9,7 @@ from pandas_datareader import data, wb
 pd.options.mode.chained_assignment = None
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+req_diff = 0.005
 
 learning_rate = 0.001
 num_epochs = 10
@@ -82,7 +83,7 @@ def prepare_stock():
 
         new_lines = []
         for line in lines:
-            if "null" not in line:
+            if "null" not in line and ",," not in line:
                 new_lines.append(line)
 
         with open(stock_csv, "w") as f:
@@ -195,18 +196,28 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             preds.append(prediction.eval(feed_dict={batchX_placeholder : testBatchX})[0][0])
 
         diff = preds[-1] - preds[-2]
-        estimate_action(diff)
+        estimate_action(diff, xTest[-1][0])
+
+def norm_to_original_diff(scalar):
+    return scalar * (dataset["Close"].max() - dataset["Close"].min())
 
 def norm_to_original(scalar):
     return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
 
-def estimate_action(d):
-    req_diff = 0.01
+def estimate_action(d, current_price):
 
     print("")
+    print("")
     print("Prediction for next close:")
-    print("Latest_date: {}".format(latest_date))
-    print("Change: {}".format(norm_to_original(d)))
+    if dt.datetime.today().strftime("%Y-%m-%d") == latest_date:
+        print("Latest_date (today): {}".format(latest_date))
+    else:
+        print("Latest_date: {}".format(latest_date))
+    print("Current price: {}".format(norm_to_original(current_price)))
+    print("")
+    print("Pred change (Normalized): {0:.3f}".format(d))
+    print("Pred change (Original): {0:.2f}".format(norm_to_original_diff(d)))
+    print("Pred close: {}".format(norm_to_original(current_price) + norm_to_original_diff(d)))
 
     if d < -req_diff:
         print("Action: Sell")

@@ -112,7 +112,7 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
                 loss_list.append(_loss)
 
         # Test len(xTest) days
-        for test_idx in range(len(xTest) - truncated_backprop_length):
+        for test_idx in range(len(xTest) - truncated_backprop_length + 1):
             if test_idx == 0:
                 testBatchY = yTest[test_idx:test_idx+truncated_backprop_length].reshape((1, truncated_backprop_length, num_classes))
                 testBatchX = xTest[test_idx:test_idx+truncated_backprop_length,:].reshape((1, truncated_backprop_length, num_features))
@@ -130,7 +130,7 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
                 test_days_differences.append(test_days_pred_list[-1] - yTest[test_idx - 1][0])
 
         # Test per day
-        for test_idx in range(len(xTest)):
+        for test_idx in range(len(xTest) - truncated_backprop_length + 1):
             testBatchX = xTest[test_idx:test_idx+truncated_backprop_length,:].reshape((1, truncated_backprop_length, num_features))
             testBatchY = yTest[test_idx:test_idx+truncated_backprop_length].reshape((1, truncated_backprop_length, num_classes))
 
@@ -213,7 +213,16 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences,
 def norm_to_original(scalar):
     return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
 
-def simulate_profit(day_diff, test_prices, starting_money=200, trading_fee=0.0006, min_fee=3, req_diff = 0.01):
+def norm_to_original_diff(scalar):
+    return scalar * (dataset["Close"].max() - dataset["Close"].min())
+
+def norm_to_original(scalar):
+    return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
+
+def simulate_profit(day_diff, predicted_prices, test_prices,
+                    starting_money=200, trading_fee=0.0006,
+                    min_fee=3, req_diff=0.01):
+
     num_shares = 0
     total_paid_fee = 0
     best_profit = 0
@@ -226,8 +235,8 @@ def simulate_profit(day_diff, test_prices, starting_money=200, trading_fee=0.000
     sell_list = []
     for count, d in enumerate(day_diff):
         current_price = norm_to_original(test_prices[count])
+        fee_amount = 0
         print("Day {}".format(count + 1))
-        print("Diff: {}".format(d))
         if d < -req_diff and num_shares > 0:
             print("State: Selling")
             sell_list.append(count)
@@ -257,20 +266,32 @@ def simulate_profit(day_diff, test_prices, starting_money=200, trading_fee=0.000
         if total_profit < worst_profit:
             worst_profit = total_profit
 
-        print("Current price: {}\nCurrent money: {}\nCurrent shares: {}\nTrading fee: {}\nTotal worth: {}\nTotal profit: {} %".format(
-            round(current_price),
-            round(current_money),
-            round(num_shares),
-            round(fee_amount),
-            round(total_worth),
-            round(total_profit)))
+        print("Predicted diff (Normalized): {0:.3f}".format(d))
+        print("Predicted diff (Original): {0:.2f}".format(norm_to_original_diff(d)))
+        print("Predicted price (offset): {}".format(round(norm_to_original(predicted_prices[count + 1]))))
+        if count > 0:
+            print("Current price (offset): {}".format(round(norm_to_original(predicted_prices[count]))))
+
+        print("")
+        print("Current price: {}".format(round(current_price)))
+        print("Current money: {}".format(round(current_money)))
+        print("Current shares: {}".format(round(num_shares)))
+        print("Trading fee: {}".format(round(fee_amount)))
+        print("Total worth: {}".format(round(total_worth)))
+        print("Total profit: {} %".format(round(total_profit)))
+        print("")
         print("")
 
+
+    print("Summary:")
     print("Total paid fee: {}\nBest profit: {} %\nWorst profit: {} %\nTotal money earned: {}".format(
         total_paid_fee,
         best_profit,
         worst_profit,
         total_worth - starting_money))
+
+    print("")
+    print("")
 
     return buy_list, sell_list, total_profit
 
@@ -278,9 +299,10 @@ if __name__ == "__main__":
     outfile = ".".join(infile.split(".")[:-1]) + "_" + outfile
     trainX, testX, trainY, testY, prices = prepare_data()
     loss, train_step, prediction, last_label, last_state, placeholder_x, placeholder_y = model()
-    day, days, test_day_differences, test_days_differences = train_and_test( loss, train_step, prediction, last_label, last_state,
-                                placeholder_x, placeholder_y,
-                                trainX, testX, trainY, testY)
+    day, days, test_day_differences, test_days_differences = train_and_test(loss, train_step, prediction,
+                                                                            last_label, last_state,
+                                                                            placeholder_x, placeholder_y,
+                                                                            trainX, testX, trainY, testY)
 
     trading_fee = 0.0006
     min_fee = 3
@@ -289,6 +311,7 @@ if __name__ == "__main__":
     profits = []
     for starting_money in starting_funds:
         buy_list, sell_list, total_profit = simulate_profit(test_day_differences,
+                                                            day,
                                                             prices, starting_money,
                                                             trading_fee=trading_fee,
                                                             min_fee=min_fee,
