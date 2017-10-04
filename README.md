@@ -106,3 +106,20 @@ Attributes of summary explanation:
 * Best profit - Percent for best profit we had in that 180 day period
 * Worst profit - Percent of worst profit we had in that 180 day period
 * Total money earned - Amount of money we have earned (not including starting money)
+
+## Real-time testing
+
+### ELISA.HE
+|Current date|Current price|Predicted close|Predicted action|
+|---|---|---|---|
+|2017-10-04|36.64|36.73|idle|
+
+### NESTE.HE
+|Current date|Current price|Predicted close|Predicted action|
+|---|---|---|---|
+|2017-10-04|37.23|37.04|Sell|
+
+### TELIA1.HE
+|Current date|Current price|Predicted close|Predicted action|
+|---|---|---|---|
+|2017-10-04|4.03|4.0027|Sell|
