@@ -112,16 +112,16 @@ Attributes of summary explanation:
 ## Real-time testing
 
 ### ELISA.HE
-|Current date|Current price|Predicted close|Predicted action|
+|Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
-|2017-10-04|36.64|36.73|idle|
+|2017-10-04|36.639998999999996|36.759780553745266|idle|
 
 ### NESTE.HE
-|Current date|Current price|Predicted close|Predicted action|
+|Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
-|2017-10-04|37.23|37.04|Sell|
+|2017-10-04|37.099998|36.68982252117914|Sell|
 
 ### TELIA1.HE
-|Current date|Current price|Predicted close|Predicted action|
+|Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
-|2017-10-04|4.03|4.0027|Sell|
+|2017-10-04|4.034|4.013893317222595|Idle|
