@@ -53,6 +53,7 @@ python3 export_inference_graph.py \
 ```
 
 # Stock market prediction
+***Note: Author has not bought or sold a share in his life***
 
 ## Prediction per day
 
@@ -65,12 +66,13 @@ For example if price is 50 today and we own 100 shares, then total value is 5000
 The point is, if we have any clue about in which direction prices will be going, we can act before it happens. We do not necessarily need to know the exact prices if we know direction.
 
 ## Virtual trading simulation
+***Simulation probably contains bugs and missing features***
 
 ![Simulation](images/simulation_graph.png)
 
-Simulation runs one day at a time and tries to predict how much price will be tomorrow compared to today's price. Based on that change AI will either buy, sell or do nothing. As we can see it has performed very optimally buying only when price is low and will rise in the future, and sell when price is about to drop.
+In above graph we have points where AI decided to buy (green) and to sell (red), based on above predictions.
 
-In above graph we have points where AI decided to buy (green) and to sell (red), based on above predictions. It has incredible ability to predict when prices are about to drop and when to rise.
+Simulation runs one day at a time and tries to predict how much price will be tomorrow compared to today's price. Based on that change AI will either buy, sell or do nothing. As we can see it has performed very optimally buying only when price is low and will rise in the future, and sell when price is about to drop.
 
 ### Trading fee
 
@@ -80,7 +82,7 @@ If we use low starting money in daily trading, trading fees will be too much bec
 
 If trading fee is 0.06% and minimum fee is 3€, we should have 3€ / (0.06% / 100) = 5000€ for most optimal profit. If we have trading fee of 0.2% and minimum fee of 9€, then we should have 9€ / (0.2% / 100) = 4500€ for most optimal profit. These are actual trading fees from [Nordnet](https://www.nordnet.fi/palvelut-ja-tuotteet/hinnasto.html).
 
-### Results
+### Results (Not tested in real world)
 
 #### TELIA1.HE (Graphs above)
 ![Results](images/result2.png)
