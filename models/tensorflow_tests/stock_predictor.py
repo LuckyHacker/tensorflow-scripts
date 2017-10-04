@@ -7,7 +7,7 @@ import os
 
 outfile = "prediction.png"
 outfolder = "output"
-infile = "ABT_alltargets.csv"
+infile = "TELIA1.HE_alltargets.csv"
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
@@ -95,7 +95,7 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
 
         # Train
         for epoch_idx in range(num_epochs):
-            print('Epoch %d, loss %.6f' % (epoch_idx, _loss))
+            print('Epoch %d, loss %.6f' % (epoch_idx + 1, _loss))
             for batch_idx in range(num_batches):
                 start_idx = batch_idx * truncated_backprop_length
                 end_idx = start_idx + truncated_backprop_length * batch_size
@@ -146,7 +146,9 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
     return test_day_pred_list, test_days_pred_list, test_day_differences, test_days_differences
 
 
-def plot_prediction(day, days, test_prices, day_differences, days_differences, buy_list, sell_list):
+def plot_prediction(day, days, test_prices, day_differences, days_differences,
+                    buy_list, sell_list, profits, starting_funds, trading_fee, min_fee, req_diff):
+
     fig = plt.figure(num=None, figsize=(22, 12), dpi=80, facecolor="white")
     fig.canvas.set_window_title("Stock prediction {}".format(infile))
     gs = gridspec.GridSpec(2, 2)
@@ -183,11 +185,22 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences, b
     ax2.legend(loc='upper left')
 
     ax3.set_xlabel("Days")
-    ax3.set_ylabel("Price (buy/sell)")
+    ax3.set_ylabel("Price")
     ax3.set_title("Virtual money simulation")
-    ax3.plot(test_prices, label='Price', color='blue', markevery=sell_list, markerfacecolor="red", markeredgecolor="red", marker="o")
+    ax3.plot(test_prices, label='Price (buy/sell)', color='blue', markevery=sell_list, markerfacecolor="red", markeredgecolor="red", marker="o")
     ax3.plot(test_prices, color='blue', markevery=buy_list, markerfacecolor="green", markeredgecolor="green", marker="o")
     ax3.legend(loc='upper left')
+
+    ax4.set_xlabel("Profit percent")
+    ax4.set_ylabel("Starting money")
+    ax4.set_title("Starting price compared to profit")
+    ax4.text(0.5, 0.85, "Trading fee: {} %\nMin fee: {}\nReq diff: {}".format(trading_fee * 100, min_fee, req_diff),
+                    fontsize=16,
+                    horizontalalignment='center',
+                    verticalalignment='center',
+                    transform=ax4.transAxes)
+    ax4.plot(profits, starting_funds, label='Profits', color='blue')
+    ax4.legend(loc='upper left')
 
     plt.figtext(0.005, 0.8, """Learning Rate = {}\nEpochs = {}\nBatch Size = {}\nTrain Size = {}\nTruncated Backprop = {}\nState Size = {}""".format(
                         learning_rate, num_epochs, batch_size, train_size,
@@ -200,13 +213,8 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences, b
 def norm_to_original(scalar):
     return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
 
-def simulate_profit(day_diff, test_prices):
-    starting_money = 5000
-    trading_fee = 0.002
-    min_fee = 9
+def simulate_profit(day_diff, test_prices, starting_money=200, trading_fee=0.0006, min_fee=3, req_diff = 0.01):
     num_shares = 0
-    req_diff = 0.01
-
     total_paid_fee = 0
     best_profit = 0
     worst_profit = 0
@@ -264,15 +272,30 @@ def simulate_profit(day_diff, test_prices):
         worst_profit,
         total_worth - starting_money))
 
-    return buy_list, sell_list
+    return buy_list, sell_list, total_profit
 
 if __name__ == "__main__":
-    outfile = infile.split(".")[0] + "_" + outfile
+    outfile = ".".join(infile.split(".")[:-1]) + "_" + outfile
     trainX, testX, trainY, testY, prices = prepare_data()
     loss, train_step, prediction, last_label, last_state, placeholder_x, placeholder_y = model()
     day, days, test_day_differences, test_days_differences = train_and_test( loss, train_step, prediction, last_label, last_state,
                                 placeholder_x, placeholder_y,
                                 trainX, testX, trainY, testY)
 
-    buy_list, sell_list = simulate_profit(test_day_differences, prices)
-    plot_prediction(day, days, prices, test_day_differences, test_days_differences, buy_list, sell_list)
+    trading_fee = 0.0006
+    min_fee = 3
+    req_diff = 0.005
+    starting_funds = list(range(50, 5050, 50))
+    profits = []
+    for starting_money in starting_funds:
+        buy_list, sell_list, total_profit = simulate_profit(test_day_differences,
+                                                            prices, starting_money,
+                                                            trading_fee=trading_fee,
+                                                            min_fee=min_fee,
+                                                            req_diff=req_diff)
+
+        profits.append(total_profit)
+
+    plot_prediction(day, days, prices, test_day_differences,
+                    test_days_differences, buy_list, sell_list,
+                    profits, starting_funds, trading_fee, min_fee, req_diff)

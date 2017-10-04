@@ -3,9 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None
 
-stock_csv = "ABT.csv"
-outfile = "ABT_alltargets.csv"
-datefile = outfile.split(".")[0] + "_latest_date.txt"
+stock_csv = "TELIA1.HE.csv"
+outfile = "TELIA1.HE_alltargets.csv"
+datefile = ".".join(outfile.split(".")[:-1]) + "_latest_date.txt"
+
 
 def MACD(df, period1, period2, periodSignal):
     EMA1 = pd.DataFrame.ewm(df, span=period1).mean()
@@ -15,10 +16,12 @@ def MACD(df, period1, period2, periodSignal):
     Histogram = MACD - Signal
     return Histogram
 
+
 def stochastics_oscillator(df, period):
     l, h = pd.DataFrame.rolling(df, period).min(), pd.DataFrame.rolling(df, period).max()
     k = 100 * (df - l) / (h - l)
     return k
+
 
 def ATR(df, period):
     df['H-L'] = abs(df['High'] - df['Low'])
@@ -26,6 +29,7 @@ def ATR(df, period):
     df['L-PC'] = abs(df['Low'] - df['Close'].shift(1))
     TR = df[['H-L', 'H-PC', 'L-PC']].max(axis=1)
     return TR.to_frame()
+
 
 def adjust_csv():
     with open(outfile, "r") as f:
@@ -43,13 +47,27 @@ def adjust_csv():
                 else:
                     new_lines.append(line)
 
-
-
     with open(outfile, "w") as f:
         for line in new_lines:
             f.write(line)
 
+
+def clear_null():
+    with open(stock_csv, "r") as f:
+        lines = f.readlines()
+
+    new_lines = []
+    for line in lines:
+        if "null" not in line:
+            new_lines.append(line)
+
+    with open(stock_csv, "w") as f:
+        for line in new_lines:
+            f.write(line)
+
+
 if __name__ == "__main__":
+    clear_null()
     df = pd.read_csv(stock_csv, usecols=[0,1,2,3,4])
 
     latest_date = df['Date'][df.index[-1]]

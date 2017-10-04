@@ -27,7 +27,8 @@ def get_data():
 def prepare_stock():
     stock_csv = "data/{}.csv".format(stock)
     outfile = "data/{}_alltargets.csv".format(stock)
-    datefile = outfile.split(".")[0] + "_latest_date.txt"
+    datefile = ".".join(outfile.split(".")[:-1]) + "_latest_date.txt"
+
 
     def MACD(df, period1, period2, periodSignal):
         EMA1 = pd.DataFrame.ewm(df, span=period1).mean()
@@ -37,10 +38,12 @@ def prepare_stock():
         Histogram = MACD - Signal
         return Histogram
 
+
     def stochastics_oscillator(df, period):
         l, h = pd.DataFrame.rolling(df, period).min(), pd.DataFrame.rolling(df, period).max()
         k = 100 * (df - l) / (h - l)
         return k
+
 
     def ATR(df, period):
         df['H-L'] = abs(df['High'] - df['Low'])
@@ -48,6 +51,7 @@ def prepare_stock():
         df['L-PC'] = abs(df['Low'] - df['Close'].shift(1))
         TR = df[['H-L', 'H-PC', 'L-PC']].max(axis=1)
         return TR.to_frame()
+
 
     def adjust_csv():
         with open(outfile, "r") as f:
@@ -71,6 +75,21 @@ def prepare_stock():
             for line in new_lines:
                 f.write(line)
 
+
+    def clear_null():
+        with open(stock_csv, "r") as f:
+            lines = f.readlines()
+
+        new_lines = []
+        for line in lines:
+            if "null" not in line:
+                new_lines.append(line)
+
+        with open(stock_csv, "w") as f:
+            for line in new_lines:
+                f.write(line)
+
+    clear_null()
     df = pd.read_csv(stock_csv, usecols=[0,1,2,3,4])
 
     latest_date = df['Date'][df.index[-1]]
@@ -101,7 +120,7 @@ def prepare_stock():
 
 def prepare_data():
     datasetNorm = (dataset - dataset.min()) / (dataset.max() - dataset.min())
-    datasetTrain = datasetNorm
+    datasetTrain = datasetNorm[:-1]
     datasetTest = datasetNorm.iloc[[-2, -1]]
 
     xTrain = datasetTrain[['Close','MACD','Stochastics','ATR']].as_matrix()
@@ -167,10 +186,6 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
                                     batchY_placeholder : batchY}
                 )
 
-                if str(_loss) == "nan":
-                    print("WARNING: Incomplete data! Quitting.")
-                    sys.exit()
-
                 loss_list.append(_loss)
 
 
@@ -212,7 +227,7 @@ if __name__ == "__main__":
         sys.exit()
 
     infile = "data/{}_alltargets.csv".format(stock)
-    datefile = infile.split(".")[0] + "_latest_date.txt"
+    datefile = ".".join(infile.split(".")[:-1]) + "_latest_date.txt"
 
     get_data()
     prepare_stock()
