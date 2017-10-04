@@ -57,6 +57,7 @@ python3 export_inference_graph.py \
 ## Prediction per day
 
 ![Prediction](images/day_prediction.png)
+
 Here we can see that prediction is not very accurate, but the shape is accurate enough. If we know behavior for the price, then we can predict if price is higher or lower tomorrow. Based on this prediction we can decide every day if we should sell or buy (or do nothing).
 
 For example if price is 50 today and we own 100 shares, then total value is 5000. Neural network predicts that price will be 47 tomorrow, so total value would be 4700 tomorrow. Unless we sell before it drops. Let's imagine we sold those stocks for price of 50 and price for tomorrow is indeed 47. Now neural network predicts price of 49 for the next day, we should buy again. 5000 / 47 means 106.38 shares. When price is 49 the next day, our total value would be 49 * 106.38 = 5212, so that would be 4% profit already. So what happened here? We dodged price drop by not owning shares when it dropped and hopped back in the game just before prices began to rise again.
@@ -66,6 +67,7 @@ The point is, if we have any clue about in which direction prices will be going,
 ## Virtual trading simulation
 
 ![Simulation](images/simulation_graph.png)
+
 Simulation runs one day at a time and tries to predict how much price will be tomorrow compared to today's price. Based on that change AI will either buy, sell or do nothing. As we can see it has performed very optimally buying only when price is low and will rise in the future, and sell when price is about to drop.
 
 In above graph we have points where AI decided to buy (green) and to sell (red), based on above predictions. It has incredible ability to predict when prices are about to drop and when to rise.
@@ -73,6 +75,7 @@ In above graph we have points where AI decided to buy (green) and to sell (red),
 ### Trading fee
 
 ![Trading fee](images/trading_fee.png)
+
 If we use low starting money in daily trading, trading fees will be too much because of the minimum fee and it will eat up our money. Above graph suggests we should have at least 200€ for starting to not lose and not gain any money.
 
 If trading fee is 0.06% and minimum fee is 3€, we should have 3€ / (0.06% / 100) = 5000€ for most optimal profit. If we have trading fee of 0.2% and minimum fee of 9€, then we should have 9€ / (0.2% / 100) = 4500€ for most optimal profit. These are actual trading fees from [Nordnet](https://www.nordnet.fi/palvelut-ja-tuotteet/hinnasto.html).
