@@ -4,10 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import os
+from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-infile = "TELIA1.HE_alltargets.csv"
+stock = "TSLA"
+infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
@@ -31,23 +33,16 @@ def prepare_data():
     datasetTrain = datasetNorm[dataset.index < train_length]
     datasetTest = datasetNorm[dataset.index >= train_length]
 
+    ohlc_dataset = pd.read_csv('../data/{}/{}'.format(infolder, stock + ".csv"))
+    OHLC = ohlc_dataset[['Open','High','Low','Close']].as_matrix()
 
-    try:
-        xTrain = datasetTrain[['Open','High','Low','Close']].as_matrix()
-        yTrain = datasetTrain[['OpenTarget','HighTarget','LowTarget','CloseTarget']].as_matrix()
-        xTest = datasetTest[['Open','High','Low','Close']].as_matrix()
-        yTest = datasetTest[['OpenTarget','HighTarget','LowTarget','CloseTarget']].as_matrix()
-        test_prices = datasetTest['Close'].as_matrix()
-        print("Using OHLC data")
-    except:
-        xTrain = datasetTrain[['Close','MACD','Stochastics','ATR']].as_matrix()
-        yTrain = datasetTrain[['CloseTarget', 'MACDTarget', 'StochasticsTarget', 'ATRTarget']].as_matrix()
-        xTest = datasetTest[['Close','MACD','Stochastics','ATR']].as_matrix()
-        yTest = datasetTest[['CloseTarget', 'MACDTarget', 'StochasticsTarget', 'ATRTarget']].as_matrix()
-        test_prices = datasetTest['Close'].as_matrix()
-        print("Using technical indicators data")
+    xTrain = datasetTrain[['Close','MACD','Stochastics','ATR']].as_matrix()
+    yTrain = datasetTrain[['CloseTarget', 'MACDTarget', 'StochasticsTarget', 'ATRTarget']].as_matrix()
+    xTest = datasetTest[['Close','MACD','Stochastics','ATR']].as_matrix()
+    yTest = datasetTest[['CloseTarget', 'MACDTarget', 'StochasticsTarget', 'ATRTarget']].as_matrix()
+    test_prices = datasetTest['Close'].as_matrix()
 
-    return xTrain, xTest, yTrain, yTest, test_prices
+    return xTrain, xTest, yTrain, yTest, test_prices, OHLC
 
 
 def model():
@@ -194,7 +189,7 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences,
     ax4.set_xlabel("Profit percent")
     ax4.set_ylabel("Starting money")
     ax4.set_title("Starting price compared to profit")
-    ax4.text(0.5, 0.85, "Trading fee: {} %\nMin fee: {}\nReq diff: {}".format(trading_fee * 100, min_fee, req_diff),
+    ax4.text(0.5, 0.85, "Trading fee: {} %\nMin fee: {}\nReq diff: {}".format(trading_fee, min_fee, req_diff),
                     fontsize=16,
                     horizontalalignment='center',
                     verticalalignment='center',
@@ -216,106 +211,27 @@ def norm_to_original(scalar):
 def norm_to_original_diff(scalar):
     return scalar * (dataset["Close"].max() - dataset["Close"].min())
 
-def simulate_profit(day_diff, predicted_prices, test_prices,
-                    starting_money=200, trading_fee=0.0006,
-                    min_fee=3, req_diff=0.01):
-
-    num_shares = 0
-    total_paid_fee = 0
-    best_profit = 0
-    worst_profit = 0
-    fee_amount = 0
-    trading_fee_ratio = 1 - trading_fee
-    current_money = starting_money
-
-    buy_list = []
-    sell_list = []
-    for count, d in enumerate(day_diff):
-        current_price = norm_to_original(test_prices[count])
-        fee_amount = 0
-        print("Day {}".format(count + 1))
-        if d < -req_diff and num_shares > 0:
-            print("State: Selling")
-            sell_list.append(count)
-            fee_amount = num_shares * current_price * trading_fee
-            if fee_amount < min_fee:
-                fee_amount = min_fee
-            current_money = num_shares * current_price - fee_amount
-            total_paid_fee += fee_amount
-            num_shares = 0
-        elif d > req_diff and num_shares == 0:
-            print("State: Buying")
-            buy_list.append(count)
-            fee_amount = current_money * trading_fee
-            if fee_amount < min_fee:
-                fee_amount = min_fee
-            total_paid_fee += fee_amount
-            num_shares = (current_money - fee_amount) / current_price
-            current_money = 0
-        else:
-            print("State: Idle")
-
-        total_worth = current_money + (num_shares * current_price)
-        total_profit = total_worth / starting_money * 100 - 100
-        if total_profit > best_profit:
-            best_profit = total_profit
-
-        if total_profit < worst_profit:
-            worst_profit = total_profit
-
-        print("Predicted diff (Normalized): {0:.3f}".format(d))
-        print("Predicted diff (Original): {0:.2f}".format(norm_to_original_diff(d)))
-        print("Predicted price (offset): {}".format(round(norm_to_original(predicted_prices[count + 1]))))
-        if count > 0:
-            print("Current price (offset): {}".format(round(norm_to_original(predicted_prices[count]))))
-
-        print("")
-        print("Current price: {}".format(round(current_price)))
-        print("Current money: {}".format(round(current_money)))
-        print("Current shares: {}".format(round(num_shares)))
-        print("Trading fee: {}".format(round(fee_amount)))
-        print("Total worth: {}".format(round(total_worth)))
-        print("Total profit: {} %".format(round(total_profit)))
-        print("")
-        print("")
-
-
-    print("Summary:")
-    print("Total paid fee: {}\nBest profit: {} %\nWorst profit: {} %\nTotal money earned: {}".format(
-        total_paid_fee,
-        best_profit,
-        worst_profit,
-        total_worth - starting_money))
-
-    print("")
-    print("")
-
-    return buy_list, sell_list, total_profit
-
 if __name__ == "__main__":
     outfile = ".".join(infile.split(".")[:-1]) + "_" + outfile
-    trainX, testX, trainY, testY, prices = prepare_data()
+    trainX, testX, trainY, testY, close_prices, OHLC = prepare_data()
     loss, train_step, prediction, last_label, last_state, placeholder_x, placeholder_y = model()
     day, days, test_day_differences, test_days_differences = train_and_test(loss, train_step, prediction,
                                                                             last_label, last_state,
                                                                             placeholder_x, placeholder_y,
                                                                             trainX, testX, trainY, testY)
 
-    trading_fee = 0.0006
-    min_fee = 3
-    req_diff = 0.005
     starting_funds = list(range(50, 5050, 50))
+    trading_fee = 0.2
+    min_fee = 9
+    req_diff = 0.01
     profits = []
-    for starting_money in starting_funds:
-        buy_list, sell_list, total_profit = simulate_profit(test_day_differences,
-                                                            day,
-                                                            prices, starting_money,
-                                                            trading_fee=trading_fee,
-                                                            min_fee=min_fee,
-                                                            req_diff=req_diff)
+    for starting_capital in starting_funds:
+        sell_list, buy_list, total_profit = StockTradingSimulation(diff=test_day_differences,
+                            ohlc=OHLC, starting_capital=starting_capital,
+                            trading_fee=trading_fee, min_fee=min_fee, req_diff=req_diff, dataset=dataset).run()
 
         profits.append(total_profit)
 
-    plot_prediction(day, days, prices, test_day_differences,
+    plot_prediction(day, days, close_prices, test_day_differences,
                     test_days_differences, buy_list, sell_list,
                     profits, starting_funds, trading_fee, min_fee, req_diff)
