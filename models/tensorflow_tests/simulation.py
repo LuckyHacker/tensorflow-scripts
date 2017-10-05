@@ -27,9 +27,9 @@ class StockTradingSimulation:
         buy_list = []
 
         for i in range(len(self.diff)):
-            self.current_high_price = self._norm_to_original(self.ohlc[i + 1][1])
-            self.current_low_price = self._norm_to_original(self.ohlc[i + 1][2])
-            self.current_open_price = self._norm_to_original(self.ohlc[i + 1][0])
+            self.current_high_price = self.ohlc[i + 1][1]
+            self.current_low_price = self.ohlc[i + 1][2]
+            self.current_open_price = self.ohlc[i + 1][0]
             self.fee_amount = 0
             print("Day {}".format(i + 1))
             if self.diff[i] < -self.req_diff and self.num_shares > 0:
