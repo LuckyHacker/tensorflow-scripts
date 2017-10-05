@@ -223,7 +223,7 @@ if __name__ == "__main__":
     starting_funds = list(range(50, 5050, 50))
     trading_fee = 0.2
     min_fee = 9
-    req_diff = 0.005
+    req_diff = 0.01
     profits = []
     for starting_capital in starting_funds:
         sell_list, buy_list, total_profit = StockTradingSimulation(diff=test_day_differences,

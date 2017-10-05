@@ -30,7 +30,10 @@ class StockTradingSimulation:
             self.current_high_price = self.ohlc[i + 1][1]
             self.current_low_price = self.ohlc[i + 1][2]
             self.current_open_price = self.ohlc[i + 1][0]
+            self.current_low_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.3
+            self.current_high_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.7
             self.fee_amount = 0
+
             print("Day {}".format(i + 1))
             if self.diff[i] < -self.req_diff and self.num_shares > 0:
                 self.state = "Sell"

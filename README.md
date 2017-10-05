@@ -78,9 +78,9 @@ Simulation runs one day at a time and tries to predict how much price will be to
 
 ![Trading fee](images/trading_fee.png)
 
-If we use low starting money in daily trading, trading fees will be too much because of the minimum fee and it will eat up our investments. Above graph suggests we should have at least 200€ for starting to not lose and not gain any money.
+If we use low starting money in daily trading, trading fees will be too much because of the minimum fee and it will eat up our investments. Above graph suggests we should have at least around 700€ for starting to not lose and not gain any money.
 
-If trading fee is 0.06% and minimum fee is 3€, we should have 3€ / (0.06% / 100) = 5000€ for most optimal profit. If we have trading fee of 0.2% and minimum fee of 9€, then we should have 9€ / (0.2% / 100) = 4500€ for most optimal profit. These are actual trading fees from [Nordnet](https://www.nordnet.fi/palvelut-ja-tuotteet/hinnasto.html).
+If trading fee is 0.06% and minimum fee is 3€, we should have 3€ / (0.06% / 100) = 5000€ for most optimal profit. If we have trading fee of 0.2% and minimum fee of 9€, then we should have 9€ / (0.2% / 100) = 4500€ for most optimal profit. These are actual trading fees from [Nordnet](https://www.nordnet.fi/palvelut-ja-tuotteet/hinnasto.html) (2017).
 
 ### Results (Not tested in real world)
 
@@ -90,24 +90,16 @@ If trading fee is 0.06% and minimum fee is 3€, we should have 3€ / (0.06% / 
 #### TSLA
 ![Results](images/result1.png)
 
-Attributes per day explanation:
-* State - Selling / Buying / Idle
+Attributes explanation:
+* State - Sell / Buy / Idle
 * Predicted diff (Normalized) - Normalized value of predicted difference
 * Predicted diff (Original) - Original value of predicted difference
-* Predicted price (offset) - Predicted price for next day
-* Current price (offset) - Last prediction (for this day)
 * Current price - Current real price
 * Current money - Amount of money we have right now
 * Current shares - Amount of shares we have right now
-* Trading fee - How much we paid trading fee this time
+* Trading fee - How much we paid trading fee this day
 * Total worth - Our total worth now (shares + money)
 * Total profit - Our total profit right now (shares + money)
-
-Attributes of summary explanation:
-* Total paid fee - Amount of fee we have paid in total for all transactions in that 180 day period
-* Best profit - Percent for best profit we had in that 180 day period
-* Worst profit - Percent of worst profit we had in that 180 day period
-* Total money earned - Amount of money we have earned (not including starting money)
 
 ## Real-time testing
 
@@ -115,13 +107,16 @@ Attributes of summary explanation:
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-04|36.639998999999996|36.759780553745266|idle|
+|2017-10-05|36.810001|36.91919343097305|Idle|
 
 ### NESTE.HE
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-04|37.099998|36.68982252117914|Sell|
+|2017-10-05|37.82|38.14151469195354|Buy|
 
 ### TELIA1.HE
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-04|4.034|4.013893317222595|Idle|
+|2017-10-05|4.084|4.125221947669982|Buy|
