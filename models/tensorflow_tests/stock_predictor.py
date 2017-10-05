@@ -216,9 +216,6 @@ def norm_to_original(scalar):
 def norm_to_original_diff(scalar):
     return scalar * (dataset["Close"].max() - dataset["Close"].min())
 
-def norm_to_original(scalar):
-    return scalar * (dataset["Close"].max() - dataset["Close"].min()) + dataset["Close"].min()
-
 def simulate_profit(day_diff, predicted_prices, test_prices,
                     starting_money=200, trading_fee=0.0006,
                     min_fee=3, req_diff=0.01):
