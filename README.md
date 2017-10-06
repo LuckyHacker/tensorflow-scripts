@@ -103,7 +103,7 @@ Attributes explanation:
 
 ## Real-time testing
 
-Using script "pred_close.py" every day to test next closing price.
+Using script "pred_close.py" once a day to predict next closing price.
 
 **With latest 2 day predictions. Difference factor got from comparing predicted close with predicted close.**
 
