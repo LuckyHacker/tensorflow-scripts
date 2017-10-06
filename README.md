@@ -103,20 +103,48 @@ Attributes explanation:
 
 ## Real-time testing
 
+Using script "pred_close.py" every day to test next closing price.
+
+**With latest 2 day predictions. Difference factor got from comparing predicted close with predicted close.**
+
 ### ELISA.HE
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-04|36.639998999999996|36.759780553745266|idle|
 |2017-10-05|36.810001|36.91919343097305|Idle|
+|2017-10-06|36.41|36.13525143623352|Sell|
 
 ### NESTE.HE
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-04|37.099998|36.68982252117914|Sell|
 |2017-10-05|37.82|38.14151469195354|Buy|
+|2017-10-06|37.950001|38.050578215625286|Idle|
 
 ### TELIA1.HE
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-04|4.034|4.013893317222595|Idle|
 |2017-10-05|4.084|4.125221947669982|Buy|
+|2017-10-06|4.064|4.049144924521446|Idle|
+
+Seems like predictions are not accurate at all with latest 2 day predictions.
+
+---
+
+**With latest 1 day prediction. Difference factor got from comparing real close with predicted one.**
+
+### ELISA.HE
+|Date|Close|Predicted close|Predicted action|
+|---|---|---|---|
+|2017-10-06|36.41|35.99591929435729|Sell|
+
+### NESTE.HE
+|Date|Close|Predicted close|Predicted action|
+|---|---|---|---|
+|2017-10-06|37.950001|38.195827298760065|Buy|
+
+### TELIA1.HE
+|Date|Close|Predicted close|Predicted action|
+|---|---|---|---|
+|2017-10-06|4.064|4.078438955426217|Idle|

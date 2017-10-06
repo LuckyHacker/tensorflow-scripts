@@ -70,8 +70,6 @@ def prepare_stock():
                     else:
                         new_lines.append(line)
 
-
-
         with open(outfile, "w") as f:
             for line in new_lines:
                 f.write(line)
@@ -122,7 +120,7 @@ def prepare_stock():
 def prepare_data():
     datasetNorm = (dataset - dataset.min()) / (dataset.max() - dataset.min())
     datasetTrain = datasetNorm[:-1]
-    datasetTest = datasetNorm.iloc[[-2, -1]]
+    datasetTest = datasetNorm.iloc[[-1]]
 
     xTrain = datasetTrain[['Close','MACD','Stochastics','ATR']].as_matrix()
     yTrain = datasetTrain[['CloseTarget', 'MACDTarget', 'StochasticsTarget', 'ATRTarget']].as_matrix()
@@ -189,13 +187,10 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
 
                 loss_list.append(_loss)
 
+        testBatchX = xTest[-1].reshape((1, truncated_backprop_length, num_features))
+        pred = prediction.eval(feed_dict={batchX_placeholder : testBatchX})[0][0]
 
-        preds = []
-        for i in range(len(xTest)):
-            testBatchX = xTest[i].reshape((1, truncated_backprop_length, num_features))
-            preds.append(prediction.eval(feed_dict={batchX_placeholder : testBatchX})[0][0])
-
-        diff = preds[-1] - preds[-2]
+        diff = xTest[-1][0] - pred
         estimate_action(diff, xTest[-1][0])
 
 def norm_to_original_diff(scalar):
@@ -247,8 +242,8 @@ if __name__ == "__main__":
         latest_date = f.read()
 
     dataset = pd.read_csv(infile)
-    train_length = len(dataset.index) - 2
-    test_length = 2
+    test_length = 1
+    train_length = len(dataset.index) - test_length
     num_batches = train_length // batch_size // truncated_backprop_length
 
     trainX, testX, trainY, testY, prices = prepare_data()
