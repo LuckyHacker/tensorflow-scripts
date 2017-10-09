@@ -138,13 +138,16 @@ Seems like predictions are not accurate at all with latest 2 day predictions.
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-06|36.41|35.99591929435729|Sell|
+|2017-10-09|36.439999|36.104108543727875|Sell|
 
 ### NESTE.HE
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-06|37.950001|38.195827298760065|Buy|
+|2017-10-09|38.990002000000004|39.6436420298226|Buy|
 
 ### TELIA1.HE
 |Date|Close|Predicted close|Predicted action|
 |---|---|---|---|
 |2017-10-06|4.064|4.078438955426217|Idle|
+|2017-10-09|4.098|4.12035799062252|Idle|
