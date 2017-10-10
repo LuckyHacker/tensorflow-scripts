@@ -105,6 +105,8 @@ Attributes explanation:
 
 Using script "pred_close.py" once a day to predict next closing price.
 
+---
+
 **With latest 2 day predictions. Difference factor got from comparing predicted close with predicted close.**
 
 ### ELISA.HE

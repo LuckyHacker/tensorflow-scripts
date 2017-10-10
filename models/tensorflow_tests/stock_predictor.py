@@ -4,11 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import os
+import time
+
 from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-stock = "TELIA1.HE"
+stock = "^OMXH25"
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
@@ -86,11 +88,10 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
         tf.global_variables_initializer().run()
         print('Train data length: %d' % train_length)
         print('Test data length: %d' % (test_length+1))
-        _loss = 0
 
         # Train
         for epoch_idx in range(num_epochs):
-            print('Epoch %d, loss %.6f' % (epoch_idx + 1, _loss))
+            begin_time = time.time()
             for batch_idx in range(num_batches):
                 start_idx = batch_idx * truncated_backprop_length
                 end_idx = start_idx + truncated_backprop_length * batch_size
@@ -105,6 +106,9 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
                 )
 
                 loss_list.append(_loss)
+
+            end_time = time.time() - begin_time
+            print('Epoch: %d, loss: %.6f, time: %.2fs' % (epoch_idx + 1, _loss, end_time))
 
         # Test len(xTest) days
         for test_idx in range(len(xTest) - truncated_backprop_length + 1):

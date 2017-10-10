@@ -30,8 +30,8 @@ class StockTradingSimulation:
             self.current_high_price = self.ohlc[i + 1][1]
             self.current_low_price = self.ohlc[i + 1][2]
             self.current_open_price = self.ohlc[i + 1][0]
-            self.current_low_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.3
-            self.current_high_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.7
+            self.current_low_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.45
+            self.current_high_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.55
             self.fee_amount = 0
 
             print("Day {}".format(i + 1))
