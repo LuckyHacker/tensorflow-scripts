@@ -101,6 +101,18 @@ Attributes explanation:
 * Total worth - Our total worth now (shares + money)
 * Total profit - Our total profit right now (shares + money)
 
+## Neural network
+
+### LSTM
+
+![LSTM](images/LSTM3-chain.png)
+
+We are doing these predictions with LSTM network. It is a RNN architecture that has some sort of memory. [Colah's blog](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) got good post about understanding LSTM networks.
+
+### Training
+
+For input ***x*** there are four values: [Closing price](http://www.investopedia.com/terms/c/closingprice.asp), [MACD](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd), [Stochastics](http://www.investopedia.com/terms/s/stochasticoscillator.asp) and [ATR](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr). For target ***y*** there are next day values for each of the input values, so we can calculate loss with [mean squared error](https://en.wikipedia.org/wiki/Mean_squared_error). Predicting all these values can be helpful if we want to make predictions for couple of days, since we can use all the predicted technical indicators to predict closing price for another day.
+
 ## Real-time testing
 
 Using script "pred_close.py" once a day to predict next closing price.
