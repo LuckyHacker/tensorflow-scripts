@@ -2,7 +2,7 @@
 class StockTradingSimulation:
 
     def __init__(self, diff, ohlc, dataset, starting_capital=5000,
-                    trading_fee=0.2, min_fee=9, req_diff=0.01):
+                    trading_fee=0.2, min_fee=9, req_diff=0.01, bad_luck=0.05):
 
         self.diff = diff
         self.ohlc = ohlc[-(len(self.diff)+1):]
@@ -10,6 +10,7 @@ class StockTradingSimulation:
         self.trading_fee = trading_fee / 100
         self.min_fee = min_fee
         self.req_diff = req_diff
+        self.bad_luck = bad_luck
         self.dataset = dataset
         self.state = "Idle"
 
@@ -30,15 +31,15 @@ class StockTradingSimulation:
             self.current_high_price = self.ohlc[i + 1][1]
             self.current_low_price = self.ohlc[i + 1][2]
             self.current_open_price = self.ohlc[i + 1][0]
-            self.current_low_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.45
-            self.current_high_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * 0.55
+            self.current_low_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * (0.50 - self.bad_luck)
+            self.current_high_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * (0.50 + self.bad_luck)
             self.fee_amount = 0
 
             print("Day {}".format(i + 1))
             if self.diff[i] < -self.req_diff and self.num_shares > 0:
                 self.state = "Sell"
                 sell_list.append(i)
-                self.current_price = self.current_open_price
+                self.current_price = self.current_low_avg_price
                 self.fee_amount = self.num_shares * self.current_price * self.trading_fee
 
                 if self.fee_amount < self.min_fee:
@@ -51,7 +52,7 @@ class StockTradingSimulation:
             elif self.diff[i] > self.req_diff and self.num_shares == 0:
                 self.state = "Buy"
                 buy_list.append(i)
-                self.current_price = self.current_open_price
+                self.current_price = self.current_high_avg_price
                 self.fee_amount = self.current_money * self.trading_fee
 
                 if self.fee_amount < self.min_fee:

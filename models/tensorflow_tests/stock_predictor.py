@@ -10,7 +10,7 @@ from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-stock = "^OMXH25"
+stock = "OUT1V.HE"
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
@@ -228,11 +228,13 @@ if __name__ == "__main__":
     trading_fee = 0.2
     min_fee = 9
     req_diff = 0.01
+    bad_luck = 0.05
     profits = []
     for starting_capital in starting_funds:
         sell_list, buy_list, total_profit = StockTradingSimulation(diff=test_day_differences,
                             ohlc=OHLC, starting_capital=starting_capital,
-                            trading_fee=trading_fee, min_fee=min_fee, req_diff=req_diff, dataset=dataset).run()
+                            trading_fee=trading_fee, min_fee=min_fee,
+                            req_diff=req_diff, dataset=dataset, bad_luck=bad_luck).run()
 
         profits.append(total_profit)
 
