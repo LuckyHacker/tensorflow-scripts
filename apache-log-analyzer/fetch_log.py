@@ -2,7 +2,7 @@ import paramiko
 import apache_log_parser
 
 
-host = "192.168.1.3"
+host = "192.168.1.5"
 
 def fetch_access_log():
     paramiko.util.log_to_file('/tmp/paramiko.log')
