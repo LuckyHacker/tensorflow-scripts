@@ -160,6 +160,7 @@ Seems like predictions are not accurate at all with latest 2 day predictions.
 |2017-10-16|36.36999900000001|36.67683042797852|Buy|
 |2017-10-17|36.549999|36.45787835392761|Idle|
 |2017-10-18|34.580002|34.88135002069855|Buy|
+|2017-10-19|34.59|34.450783901214606|Idle|
 
 ### NESTE.HE
 |Date|Close|Predicted close|Predicted action|
@@ -173,6 +174,7 @@ Seems like predictions are not accurate at all with latest 2 day predictions.
 |2017-10-16|38.740002000000004|38.42744383504034|Sell|
 |2017-10-17|39.389998999999996|39.26166404014384|Idle|
 |2017-10-18|40.060001|39.99672215212375|Idle|
+|2017-10-19|40.400002|40.78523809283806|Buy|
 
 ### TELIA1.HE
 |Date|Close|Predicted close|Predicted action|
@@ -186,3 +188,4 @@ Seems like predictions are not accurate at all with latest 2 day predictions.
 |2017-10-16|4.114|4.142213050603867|Buy|
 |2017-10-17|4.1080000000000005|4.121456905364991|Idle|
 |2017-10-18|4.08|4.100364103317261|Idle|
+|2017-10-19|4.04|4.07605891942978|Buy|
