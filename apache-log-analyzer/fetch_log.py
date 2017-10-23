@@ -2,9 +2,10 @@ import paramiko
 import apache_log_parser
 import pandas as pd
 import numpy as np
+import csv
 
 
-host = "192.168.1.5"
+host = "172.17.0.225"
 csv_file_path = "data/access.csv"
 log_file_path = "data/access.log"
 
@@ -61,48 +62,61 @@ def parse_log():
 
     parsed_lines = []
     line_parser = apache_log_parser.make_parser('%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i')
-    with open("data/access.csv", "w") as csv:
-        csv.write(",".join(csv_header_fields) + "\n")
-        with open("data/access.log", "r") as f:
+    with open(csv_file_path, 'w') as csvfile:
+        csvfile.write(",".join(csv_header_fields) + "\n")
+        with open(log_file_path, "r") as f:
             for line in f.readlines():
                 parsed_line = line_parser(line)
                 date, time = parsed_line["time_received_isoformat"].split("T")
-                csv_line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
-                        date,
-                        time,
-                        parsed_line["request_header_user_agent__browser__version_string"],
-                        parsed_line["request_header_referer"],
-                        parsed_line["request_url"],
-                        parsed_line["request_url_username"],
-                        parsed_line["remote_host"],
-                        parsed_line["request_header_user_agent__os__version_string"],
-                        parsed_line["request_url_password"],
-                        parsed_line["request_url_path"],
-                        parsed_line["request_url_port"],
-                        parsed_line["request_url_query"],
-                        parsed_line["request_http_ver"],
-                        parsed_line["response_bytes_clf"],
-                        parsed_line["request_url_scheme"],
-                        parsed_line["request_header_user_agent__is_mobile"],
-                        parsed_line["request_url_netloc"],
-                        parsed_line["request_header_user_agent__browser__family"],
-                        parsed_line["request_url_hostname"],
-                        parsed_line["remote_user"],
-                        parsed_line["request_header_user_agent__os__family"],
-                        parsed_line["request_method"],
-                        parsed_line["request_first_line"],
-                        parsed_line["request_url_fragment"],
-                        parsed_line["status"],
-                        parsed_line["request_header_user_agent"],
-                        parsed_line["remote_logname"])
+                csv_line = [date,
+                            time,
+                            parsed_line.get("request_header_user_agent__browser__version_string", "None"),
+                            parsed_line.get("request_header_referer", "None"),
+                            parsed_line.get("request_url", "None"),
+                            parsed_line.get("request_url_username", "None"),
+                            parsed_line.get("remote_host", "None"),
+                            parsed_line.get("request_header_user_agent__os__version_string", "None"),
+                            parsed_line.get("request_url_password", "None"),
+                            parsed_line.get("request_url_path", "None"),
+                            parsed_line.get("request_url_port", "None"),
+                            parsed_line.get("request_url_query", "None"),
+                            parsed_line.get("request_http_ver", "None"),
+                            parsed_line.get("response_bytes_clf", "None"),
+                            parsed_line.get("request_url_scheme", "None"),
+                            parsed_line.get("request_header_user_agent__is_mobile", "None"),
+                            parsed_line.get("request_url_netloc", "None"),
+                            parsed_line.get("request_header_user_agent__browser__family", "None"),
+                            parsed_line.get("request_url_hostname", "None"),
+                            parsed_line.get("remote_user", "None"),
+                            parsed_line.get("request_header_user_agent__os__family", "None"),
+                            parsed_line.get("request_method", "None"),
+                            parsed_line.get("request_first_line", "None"),
+                            parsed_line.get("request_url_fragment", "None"),
+                            parsed_line.get("status", "None"),
+                            parsed_line.get("request_header_user_agent", "None"),
+                            parsed_line.get("remote_logname", "None"),
+                            ]
 
-                csv.write(csv_line)
+                writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+                writer.writerow(string_to_vector(csv_line))
+
+
+def string_to_vector(string_list):
+    vector_list = []
+    for s in string_list:
+        if s != "":
+            vector_list.append(float(sum(list(map(lambda x: ord(x), str(s)))) / len(str(s))))
+        else:
+            vector_list.append(float(0))
+
+    return vector_list
+
 
 
 def fill_csv_null():
     df = pd.read_csv(csv_file_path)
     df = df.replace(np.NaN, "None", regex=True)
-    df.to_csv(csv_file_path)
+    df.to_csv(csv_file_path, index=False)
 
 
 
