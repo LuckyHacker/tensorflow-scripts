@@ -98,18 +98,18 @@ def parse_log():
                             ]
 
                 writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
-                writer.writerow(string_to_vector(csv_line))
+                writer.writerow(string_to_scalar(csv_line))
 
 
-def string_to_vector(string_list):
-    vector_list = []
+def string_to_scalar(string_list):
+    scalar_list = []
     for s in string_list:
         if s != "":
-            vector_list.append(float(sum(list(map(lambda x: ord(x), str(s)))) / len(str(s))))
+            scalar_list.append(float(sum(list(map(lambda x: ord(x), str(s)))) / len(str(s))))
         else:
-            vector_list.append(float(0))
+            scalar_list.append(float(0))
 
-    return vector_list
+    return scalar_list
 
 
 
