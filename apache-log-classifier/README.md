@@ -1,1 +1,1 @@
-# Apache log analyzer
+# Apache log classifier
