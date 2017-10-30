@@ -5,7 +5,7 @@ Custom scripts for machine learning
 
 #### [Object detection](models/object_detection/README.md)
 
-#### [Stock market prediction](models/tensorflow_tests/README.md)
+#### [Stock market prediction](models/stock_market_prediction/README.md)
 
 #### [Apache log analyzer](apache-log-analyzer/README.md)
 
