@@ -10,7 +10,7 @@ from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-stock = "TSLA"
+stock = "OUT1V.HE"
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
@@ -139,7 +139,9 @@ def train_and_test( loss, train_step, prediction, last_label, last_state,
             _last_state, _last_label, test_pred = sess.run([last_state, last_label, prediction], feed_dict=feed)
             test_day_pred_list.append(test_pred[-1][0])
 
-            if test_idx > 0:
+            if test_idx == 0:
+                test_day_differences.append(test_day_pred_list[-1] - yTest[0][0])
+            elif test_idx > 0:
                 test_day_differences.append(test_day_pred_list[-1] - test_day_pred_list[-2])
 
     return test_day_pred_list, test_days_pred_list, test_day_differences, test_days_differences
@@ -159,6 +161,8 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences,
     day_price_error = sum(day_differences) / len(day_differences) * (dataset["Close"].max() - dataset["Close"].min())
     days_price_error = sum(days_differences) / len(days_differences) * (dataset["Close"].max() - dataset["Close"].min())
 
+
+    day.insert(0, test_prices[0])
     ax1.set_xlabel("Days")
     ax1.set_ylabel("Price")
     ax1.set_title("Close price prediction per day")
@@ -171,6 +175,7 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences,
     ax1.plot(day, label='Predicted', color='red')
     ax1.legend(loc='upper left')
 
+    days.insert(0, test_prices[0])
     ax2.set_xlabel("Days")
     ax2.set_ylabel("Price")
     ax2.set_title("Prediction for {} days".format(len(test_prices)))
@@ -228,7 +233,7 @@ if __name__ == "__main__":
     trading_fee = 0.2
     min_fee = 9
     req_diff = 0.01
-    bad_luck = 0.05
+    bad_luck = 0.02
     profits = []
     for starting_capital in starting_funds:
         sell_list, buy_list, total_profit = StockTradingSimulation(diff=test_day_differences,

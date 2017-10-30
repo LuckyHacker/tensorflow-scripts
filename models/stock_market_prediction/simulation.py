@@ -5,7 +5,7 @@ class StockTradingSimulation:
                     trading_fee=0.2, min_fee=9, req_diff=0.01, bad_luck=0.05):
 
         self.diff = diff
-        self.ohlc = ohlc[-(len(self.diff)+1):]
+        self.ohlc = ohlc[-len(self.diff):]
         self.starting_capital = starting_capital
         self.trading_fee = trading_fee / 100
         self.min_fee = min_fee
@@ -23,14 +23,15 @@ class StockTradingSimulation:
         self.trading_fee_ratio = 1 - self.trading_fee
         self.current_money = self.starting_capital
 
+
     def run(self):
         sell_list = []
         buy_list = []
 
         for i in range(len(self.diff)):
-            self.current_high_price = self.ohlc[i + 1][1]
-            self.current_low_price = self.ohlc[i + 1][2]
-            self.current_open_price = self.ohlc[i + 1][0]
+            self.current_high_price = self.ohlc[i][1]
+            self.current_low_price = self.ohlc[i][2]
+            self.current_open_price = self.ohlc[i][0]
             self.current_low_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * (0.50 - self.bad_luck)
             self.current_high_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * (0.50 + self.bad_luck)
             self.fee_amount = 0
@@ -39,7 +40,7 @@ class StockTradingSimulation:
             if self.diff[i] < -self.req_diff and self.num_shares > 0:
                 self.state = "Sell"
                 sell_list.append(i)
-                self.current_price = self.current_low_avg_price
+                self.current_price = self.current_open_price
                 self.fee_amount = self.num_shares * self.current_price * self.trading_fee
 
                 if self.fee_amount < self.min_fee:
@@ -52,7 +53,7 @@ class StockTradingSimulation:
             elif self.diff[i] > self.req_diff and self.num_shares == 0:
                 self.state = "Buy"
                 buy_list.append(i)
-                self.current_price = self.current_high_avg_price
+                self.current_price = self.current_open_price
                 self.fee_amount = self.current_money * self.trading_fee
 
                 if self.fee_amount < self.min_fee:
@@ -82,11 +83,15 @@ class StockTradingSimulation:
             print("Current price: {}".format(round(self.current_price)))
             print("Current money: {}".format(round(self.current_money)))
             print("Current shares: {}".format(round(self.num_shares)))
-            print("Trading fee: {}".format(round(self.fee_amount)))
+            print("Total paid fee: {}".format(round(self.total_paid_fee)))
             print("Total worth: {}".format(round(self.total_worth)))
             print("Total profit: {} %".format(round(self.total_profit)))
             print("")
             print("")
+
+        total_worth_wo = (self.starting_capital / self.ohlc[0][0]) * self.ohlc[-1][0]
+        total_profit_wo = total_worth_wo / self.starting_capital * 100 - 100
+        print("Total profit without trading: {}%".format(round(total_profit_wo)))
 
         return sell_list, buy_list, self.total_profit
 
