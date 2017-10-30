@@ -7,7 +7,7 @@ Custom scripts for machine learning
 
 #### [Stock market prediction](models/stock_market_prediction/README.md)
 
-#### [Apache log analyzer](apache-log-analyzer/README.md)
+#### [Apache log classifier](models/apache-log-classifier/README.md)
 
 ---
 
