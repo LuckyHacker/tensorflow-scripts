@@ -1,17 +1,19 @@
-import tflearn
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
 
 
 train_size = 0.9
-batch_size = 30
-state_size = 12
+batch_size = 10
+state_size = 64
 num_features = 30
-dropout = 0.2
+num_classes = 1
+dropout = 0.5
 learning_rate = 0.001
-epochs = 100
+epochs = 5
 
 csv_file_path = "data/creditcard_sampled.csv"
 
@@ -27,47 +29,57 @@ features = [
             ]
 
 def prepare_data():
-    #datasetNorm = (dataset - dataset.min()) / (dataset.max() - dataset.min())
-    datasetNorm = dataset.sample(frac=1)
-    datasetTrain = datasetNorm[dataset.index < train_length]
-    datasetTest = datasetNorm[dataset.index >= train_length]
+    dataset_norm = (dataset - dataset.min()) / (dataset.max() - dataset.min())
 
-    xTrain = datasetTrain[features].as_matrix()
-    yTrain = datasetTrain[["Class"]].as_matrix()
-    xTest = datasetTest[features].as_matrix()
-    yTest = datasetTest[["Class"]].as_matrix()
+    dataset_norm = dataset_norm.sample(frac=1)
+    dataset_train = dataset_norm[dataset.index < train_length]
+    dataset_test = dataset_norm[dataset.index >= train_length]
 
-    return xTrain, yTrain, xTest, yTest
+    x_train = dataset_train[features].as_matrix()
+    y_train = dataset_train[["Class"]].as_matrix()
+    x_test = dataset_test[features].as_matrix()
+    y_test = dataset_test[["Class"]].as_matrix()
+
+    return x_train, y_train, x_test, y_test
+
 
 def plot_data(x, y):
-    sns.set_style("darkgrid")
-    plt.plot(x, y)
+    bins = np.linspace(-2, 2, 10)
+
+    plt.hist(x, bins, alpha=1, label='predicted: 0')
+    plt.hist(y, bins, alpha=1, label='predicted: 1')
+    plt.legend(loc='upper right')
     plt.show()
 
-def train(trainX, trainY, testX, testY):
+
+def train(x_train, y_train, x_test, y_test):
     # Reshape data
-    """
-    trainX = trainX.reshape([len(trainX), num_features])
-    testX = testX.reshape([len(testX), num_features])
-    trainY = trainY.reshape([len(trainY), 1])
-    testY = testY.reshape([len(testY), 1])
-    """
+    x_train = x_train[:-(len(x_train) % num_features)].reshape([-1, num_features])
+    y_train = y_train[:-(len(y_train) % num_features)].reshape([-1, num_classes])
+    x_test = x_test[:-(len(x_test) % num_features)].reshape([-1, num_features])
+    y_test = y_test[:-(len(y_test) % num_features)].reshape([-1, num_classes])
 
-    print(trainX.shape)
-    print(trainY.shape)
     # Network building
-    input_ = tflearn.input_data([None, num_features])
-    print(input_)
-    linear = tflearn.single_unit(input_)
-    regression = tflearn.regression(linear, optimizer='sgd', loss='mean_square',
-    metric='R2', learning_rate=learning_rate)
+    model = Sequential()
+    model.add(Dense(state_size, input_dim=num_features, activation='relu'))
+    model.add(Dropout(dropout))
+    model.add(Dense(state_size, activation='relu'))
+    model.add(Dropout(dropout))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
-    # Training
-    model = tflearn.DNN(regression, tensorboard_verbose=3)
-    model.fit(trainX, trainY, validation_set=(testX, testY), show_metric=True,
-              batch_size=batch_size, n_epoch=epochs)
+    model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size)
+
+
+    score = model.evaluate(x_test, y_test, batch_size=batch_size)
+    print("\nAccuracy: {0:.2f} % ".format(score[1] * 100))
+
+
+    preds = list(map(lambda x: int(round(x[0])), model.predict(x_test)))
+    plot_data([0] * preds.count(0), [1] * preds.count(1))
+
 
 
 if __name__ == "__main__":
-    xTrain, yTrain, xTest, yTest = prepare_data()
-    train(xTrain, yTrain, xTest, yTest)
+    x_train, y_train, x_test, y_test = prepare_data()
+    train(x_train, y_train, x_test, y_test)
