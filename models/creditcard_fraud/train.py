@@ -4,16 +4,17 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
+from keras.callbacks import TensorBoard
 
 
-train_size = 0.9
-batch_size = 10
-state_size = 64
+train_size = 0.8
+batch_size = 30
+state_size = 60
 num_features = 30
 num_classes = 1
 dropout = 0.5
 learning_rate = 0.001
-epochs = 5
+epochs = 1000
 
 csv_file_path = "data/creditcard_sampled.csv"
 
@@ -40,6 +41,11 @@ def prepare_data():
     x_test = dataset_test[features].as_matrix()
     y_test = dataset_test[["Class"]].as_matrix()
 
+    x_train = x_train[:-(len(x_train) % num_features)].reshape([-1, num_features])
+    y_train = y_train[:-(len(y_train) % num_features)].reshape([-1, num_classes])
+    x_test = x_test[:-(len(x_test) % num_features)].reshape([-1, num_features])
+    y_test = y_test[:-(len(y_test) % num_features)].reshape([-1, num_classes])
+
     return x_train, y_train, x_test, y_test
 
 
@@ -53,23 +59,23 @@ def plot_data(x, y):
 
 
 def train(x_train, y_train, x_test, y_test):
-    # Reshape data
-    x_train = x_train[:-(len(x_train) % num_features)].reshape([-1, num_features])
-    y_train = y_train[:-(len(y_train) % num_features)].reshape([-1, num_classes])
-    x_test = x_test[:-(len(x_test) % num_features)].reshape([-1, num_features])
-    y_test = y_test[:-(len(y_test) % num_features)].reshape([-1, num_classes])
-
     # Network building
     model = Sequential()
     model.add(Dense(state_size, input_dim=num_features, activation='relu'))
     model.add(Dropout(dropout))
-    model.add(Dense(state_size, activation='relu'))
+    model.add(Dense(state_size // 2, activation='relu'))
+    model.add(Dropout(dropout))
+    model.add(Dense(state_size // 4, activation='softmax'))
     model.add(Dropout(dropout))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
-    model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size)
+    tensorboardlog = TensorBoard(log_dir='./keras_log', histogram_freq=0, write_graph=True, write_images=True)
+    history = model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[tensorboardlog])
 
+    losses = history.history["loss"]
+    plt.plot(list(range(len(losses))), losses, "-")
+    plt.show()
 
     score = model.evaluate(x_test, y_test, batch_size=batch_size)
     print("\nAccuracy: {0:.2f} % ".format(score[1] * 100))
