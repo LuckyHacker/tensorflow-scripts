@@ -6,10 +6,10 @@
     "ftp-data": 5,
     "http": 3,
     "irc": 12,
-    "pop3": 7,
+    "pop3": 8,
     "radius": 13,
     "smtp": 4,
     "snmp": 10,
-    "ssh": 8,
+    "ssh": 7,
     "ssl": 11
 }

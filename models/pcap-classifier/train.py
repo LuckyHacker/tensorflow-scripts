@@ -1,14 +1,11 @@
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.callbacks import TensorBoard
-from keras.preprocessing.text import Tokenizer
 from collections import Counter
 from dataset_tools import normalize, SplitDataframe, Balancer, tokenize_dataframe
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import time
-import json
 
 
 train_size = 0.8
@@ -16,16 +13,18 @@ batch_size = 2048
 state_size = 90
 num_features = 43
 num_classes = 1
-dropout = 0.5
+dropout = 0.2
 learning_rate = 0.001
-epochs = 500
+epochs = 100
 
+model_path = "model"
 train_csv_file_path = "data/UNSW_NB15_training-set.csv"
 test_csv_file_path = "data/UNSW_NB15_testing-set.csv"
 
 df_train = pd.read_csv(train_csv_file_path)
 df_test = pd.read_csv(test_csv_file_path)
 df = pd.concat([df_train, df_test], ignore_index=False)
+df = df_test
 
 
 def count_dict(l):
@@ -59,11 +58,20 @@ def train(x_train, y_train, x_test, y_test):
     model = Sequential()
     model.add(Dense(state_size, input_dim=num_features, activation='relu'))
     model.add(Dropout(dropout))
+    model.add(Dense(state_size // 2, input_dim=num_features, activation='relu'))
+    model.add(Dropout(dropout))
+    model.add(Dense(state_size // 4, input_dim=num_features, activation='relu'))
+    model.add(Dropout(dropout))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
     tensorboardlog = TensorBoard(log_dir='./keras_log', histogram_freq=0, write_graph=True, write_images=True)
     history = model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[tensorboardlog])
+
+    with open("{}.json".format(model_path), "w") as f:
+        f.write(model.to_json())
+
+    model.save_weights("{}.h5".format(model_path))
 
     score = model.evaluate(x_test, y_test, batch_size=batch_size)
     print("\nAccuracy: {0:.2f} % ".format(score[1] * 100))
