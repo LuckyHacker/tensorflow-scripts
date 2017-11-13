@@ -2,7 +2,8 @@
 class StockTradingSimulation:
 
     def __init__(self, diff, ohlc, dataset, starting_capital=5000,
-                    trading_fee=0.2, min_fee=9, req_diff=0.01, bad_luck=0.05):
+                    trading_fee=0.2, min_fee=9, req_diff=0.01, bad_luck=0.05,
+                    price="close"):
 
         self.diff = diff
         self.ohlc = ohlc[-len(self.diff):]
@@ -12,6 +13,7 @@ class StockTradingSimulation:
         self.req_diff = req_diff
         self.bad_luck = bad_luck
         self.dataset = dataset
+        self.price = price
         self.state = "Idle"
 
         self.num_shares = 0
@@ -28,19 +30,27 @@ class StockTradingSimulation:
         sell_list = []
         buy_list = []
 
-        for i in range(len(self.diff)):
-            self.current_high_price = self.ohlc[i][1]
-            self.current_low_price = self.ohlc[i][2]
-            self.current_open_price = self.ohlc[i][0]
+        for i in range(len(self.diff) - 1):
+            # + 1 day (next day prices will be used)
+            self.current_open_price = self.ohlc[i + 1][0]
+            self.current_high_price = self.ohlc[i + 1][1]
+            self.current_low_price = self.ohlc[i + 1][2]
+            self.current_close_price = self.ohlc[i + 1][3]
+
             self.current_low_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * (0.50 - self.bad_luck)
             self.current_high_avg_price = self.current_low_price + (self.current_high_price - self.current_low_price) * (0.50 + self.bad_luck)
             self.fee_amount = 0
+            self.used_prices = {"open": self.current_open_price,
+                                "close": self.current_close_price,
+                                "low_avg": self.current_low_avg_price,
+                                "high_avg": self.current_high_avg_price,
+                                }
 
             print("Day {}".format(i + 1))
             if self.diff[i] < -self.req_diff and self.num_shares > 0:
                 self.state = "Sell"
                 sell_list.append(i)
-                self.current_price = self.current_open_price
+                self.current_price = self.used_prices[self.price]
                 self.fee_amount = self.num_shares * self.current_price * self.trading_fee
 
                 if self.fee_amount < self.min_fee:
@@ -53,14 +63,14 @@ class StockTradingSimulation:
             elif self.diff[i] > self.req_diff and self.num_shares == 0:
                 self.state = "Buy"
                 buy_list.append(i)
-                self.current_price = self.current_open_price
+                self.current_price = self.used_prices[self.price]
                 self.fee_amount = self.current_money * self.trading_fee
 
                 if self.fee_amount < self.min_fee:
                     self.fee_amount = self.min_fee
 
-                self.total_paid_fee += self.fee_amount
                 self.num_shares = (self.current_money - self.fee_amount) / self.current_price
+                self.total_paid_fee += self.fee_amount
                 self.current_money = 0
 
             else:

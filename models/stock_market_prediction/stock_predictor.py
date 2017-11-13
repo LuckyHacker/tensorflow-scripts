@@ -10,16 +10,16 @@ from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-stock = "OUT1V.HE"
+stock = "amd"
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
-num_epochs = 10
+num_epochs = 30
 batch_size = 1
 train_size = 0.9
 truncated_backprop_length = 1
-state_size = 12
+state_size = 8
 num_features = 4
 num_classes = 4
 
@@ -162,7 +162,6 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences,
     days_price_error = sum(days_differences) / len(days_differences) * (dataset["Close"].max() - dataset["Close"].min())
 
 
-    day.insert(0, test_prices[0])
     ax1.set_xlabel("Days")
     ax1.set_ylabel("Price")
     ax1.set_title("Close price prediction per day")
@@ -175,7 +174,6 @@ def plot_prediction(day, days, test_prices, day_differences, days_differences,
     ax1.plot(day, label='Predicted', color='red')
     ax1.legend(loc='upper left')
 
-    days.insert(0, test_prices[0])
     ax2.set_xlabel("Days")
     ax2.set_ylabel("Price")
     ax2.set_title("Prediction for {} days".format(len(test_prices)))
