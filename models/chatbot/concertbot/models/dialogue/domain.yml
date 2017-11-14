@@ -1,0 +1,36 @@
+action_factory: null
+actions:
+- utter_default
+- utter_greet
+- utter_goodbye
+- utter_youarewelcome
+- actions.ActionSearchConcerts
+- actions.ActionSearchVenues
+- actions.ActionShowConcertReviews
+- actions.ActionShowVenueReviews
+config:
+  store_entities_as_slots: true
+entities:
+- name
+intents:
+- greet
+- thankyou
+- goodbye
+- search_concerts
+- search_venues
+- compare_reviews
+slots:
+  concerts:
+    type: list
+  venues:
+    type: list
+templates:
+  utter_default:
+  - text: default message
+  utter_goodbye:
+  - text: goodbye :(
+  utter_greet:
+  - text: hey there!
+  utter_youarewelcome:
+  - text: you're very welcome
+topics: []
