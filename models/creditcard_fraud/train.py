@@ -14,7 +14,7 @@ num_features = 30 # 19 (feature engineering) or 30 (all features)
 num_classes = 1
 dropout = 0.5
 learning_rate = 0.0005
-epochs = 40000
+epochs = 1000
 
 csv_file_path = "data/creditcard_sampled.csv"
 

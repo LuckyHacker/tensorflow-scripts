@@ -10,12 +10,12 @@ from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-stock = "amd"
+stock = "TSLA"
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
-num_epochs = 30
+num_epochs = 10
 batch_size = 1
 train_size = 0.9
 truncated_backprop_length = 1
