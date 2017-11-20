@@ -8,7 +8,7 @@ from keras.callbacks import TensorBoard
 
 
 train_size = 0.8
-batch_size = 2048
+batch_size = 32
 state_size = 60
 num_features = 30 # 19 (feature engineering) or 30 (all features)
 num_classes = 1
