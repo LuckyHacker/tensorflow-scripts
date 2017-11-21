@@ -101,3 +101,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+# datasets
+sample-1M.jsonl
+tokens.pkl
