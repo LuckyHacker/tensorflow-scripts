@@ -244,7 +244,6 @@ with tf.Session(graph=graph) as session:
 
 # Step 6: Visualize the embeddings.
 
-
 # pylint: disable=missing-docstring
 # Function to draw visualization of distance between embeddings.
 def plot_with_labels(low_dim_embs, labels, filename):
@@ -254,11 +253,11 @@ def plot_with_labels(low_dim_embs, labels, filename):
         x, y = low_dim_embs[i, :]
         plt.scatter(x, y)
         plt.annotate(label,
-                                 xy=(x, y),
-                                 xytext=(5, 2),
-                                 textcoords='offset points',
-                                 ha='right',
-                                 va='bottom')
+                     xy=(x, y),
+                     xytext=(5, 2),
+                     textcoords='offset points',
+                     ha='right',
+                     va='bottom')
 
     plt.savefig(filename)
 
