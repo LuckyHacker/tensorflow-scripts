@@ -107,3 +107,15 @@ venv.bak/
 sample-1M.jsonl
 tokens.pkl
 text8
+*.db
+*.to
+*.from
+
+# tensorboard
+train_log/
+
+# nmt-chatbot
+best_bleu/
+
+# tensorflow
+translate.ckpt*

@@ -2,7 +2,7 @@ import sqlite3
 import json
 from datetime import datetime
 
-timeframe = '2005-12'
+timeframe = '2015-05'
 sql_transaction = []
 
 connection = sqlite3.connect('{}.db'.format(timeframe))
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     row_counter = 0
     paired_rows = 0
 
-    with open('RC_{}'.format(timeframe), buffering=1000) as f:
+    with open('/home/onni/reddit_data/RC_{}/data'.format(timeframe), buffering=1000) as f:
         for row in f:
             row_counter += 1
             row = json.loads(row)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
             body = format_data(row['body'])
             created_utc = row['created_utc']
             score = row['score']
-            comment_id = row['subreddit_id']
+            comment_id = row['name']
             subreddit = row['subreddit']
             parent_data = find_parent(parent_id)
             if score >= 2:
