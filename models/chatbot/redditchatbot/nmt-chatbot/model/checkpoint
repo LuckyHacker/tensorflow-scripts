@@ -1,0 +1,6 @@
+model_checkpoint_path: "/home/onni/Desktop/tensorflow-scripts/models/chatbot/redditchatbot/nmt-chatbot/model/translate.ckpt-500000"
+all_model_checkpoint_paths: "/home/onni/Desktop/tensorflow-scripts/models/chatbot/redditchatbot/nmt-chatbot/model/translate.ckpt-496000"
+all_model_checkpoint_paths: "/home/onni/Desktop/tensorflow-scripts/models/chatbot/redditchatbot/nmt-chatbot/model/translate.ckpt-497000"
+all_model_checkpoint_paths: "/home/onni/Desktop/tensorflow-scripts/models/chatbot/redditchatbot/nmt-chatbot/model/translate.ckpt-498000"
+all_model_checkpoint_paths: "/home/onni/Desktop/tensorflow-scripts/models/chatbot/redditchatbot/nmt-chatbot/model/translate.ckpt-499000"
+all_model_checkpoint_paths: "/home/onni/Desktop/tensorflow-scripts/models/chatbot/redditchatbot/nmt-chatbot/model/translate.ckpt-500000"
