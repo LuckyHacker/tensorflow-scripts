@@ -276,4 +276,3 @@ if __name__ == "__main__":
         else:
             for i, _ in enumerate(answers['scores']):
                 print("{}- {}{}".format(colorama.Fore.GREEN if answers['scores'][i] == 1 else colorama.Fore.YELLOW if answers['scores'][i] == 0 else colorama.Fore.RED, answers['answers'][i], colorama.Fore.RESET))
-
