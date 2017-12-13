@@ -1,7 +1,7 @@
 import sqlite3
 import pandas as pd
 import datetime
-from datetime import relativedelta
+from dateutil.relativedelta import relativedelta
 
 
 startDate = "2014-01"
