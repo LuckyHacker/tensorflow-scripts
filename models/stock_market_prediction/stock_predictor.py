@@ -10,7 +10,7 @@ from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-stock = "TSLA"
+stock = "ABT"
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
