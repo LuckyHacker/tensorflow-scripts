@@ -2,8 +2,8 @@ import bz2
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-startDate = '2017-01'
-endDate = '2017-10'
+startDate = '2014-01'
+endDate = '2014-03'
 dir_path = "/media/onni/2tb/"
 
 

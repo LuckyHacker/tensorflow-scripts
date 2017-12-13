@@ -2,13 +2,11 @@ import sqlite3
 import json
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import sys
 
-startDate = '2014-01'
-endDate = '2017-10'
+startDate = sys.argv[1]
+endDate = sys.argv[2]
 sql_transaction = []
-
-connection = sqlite3.connect('{}_-_{}.db'.format(startDate, endDate))
-c = connection.cursor()
 
 
 def generate_dates():
@@ -103,13 +101,15 @@ def find_existing_score(pid):
         return False
 
 if __name__ == '__main__':
-    create_table()
     row_counter = 0
     paired_rows = 0
 
     timeframes = generate_dates()
 
     for timeframe in timeframes:
+        connection = sqlite3.connect('{}.db'.format(timeframe))
+        c = connection.cursor()
+        create_table()
         filepath = '/media/onni/2tb/RC_{}'.format(timeframe)
         print("Parsing {}".format(filepath))
         with open(filepath, buffering=1000) as f:

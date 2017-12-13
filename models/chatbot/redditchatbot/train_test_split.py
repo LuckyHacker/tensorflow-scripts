@@ -1,10 +1,10 @@
 import sqlite3
 import pandas as pd
 
-db_path = "2014-01_-_2017-10.db"
+timeframes = ["2014-01_-_2015-11"]
 
 for timeframe in timeframes:
-    connection = sqlite3.connect('{}'.format(db_path))
+    connection = sqlite3.connect('{}.db'.format(timeframe))
     c = connection.cursor()
     limit = 5000
     last_unix = 0
