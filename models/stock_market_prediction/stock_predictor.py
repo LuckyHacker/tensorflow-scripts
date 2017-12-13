@@ -10,7 +10,11 @@ from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
+<<<<<<< HEAD
 stock = "ABT"
+=======
+stock = "OUT1V.HE"
+>>>>>>> f20de2d49879e428b51d3eb7d6270089765a2d1b
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 

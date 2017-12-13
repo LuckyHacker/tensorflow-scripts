@@ -2,13 +2,13 @@ import bz2
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-startDate = '2005-12'
-endDate = '2017-10'
-dir_path = "/media/onni/e4f9824a-a2e1-43d7-bc30-c772be2fb9f2/"
+startDate = '2014-01'
+endDate = '2014-03'
+dir_path = "/media/onni/2tb/"
 
 
 def generate_dates():
-    print("Generate all dates from {} to {}".format(startDate, endDate))
+    print("Generating all dates from {} to {}".format(startDate, endDate))
     start = datetime.strptime(startDate, '%Y-%m').date()
     end = datetime.strptime(endDate, '%Y-%m').date()
     all_dates = [startDate]
