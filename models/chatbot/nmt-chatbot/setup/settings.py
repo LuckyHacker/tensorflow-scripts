@@ -62,7 +62,7 @@ hparams = {
     'dev_prefix': os.path.join(train_dir, "tst2012"),
     'test_prefix': os.path.join(train_dir, "tst2013"),
     'out_dir': out_dir,
-    'num_train_steps': 500000,
+    'num_train_steps': 1000000000,
     'num_layers': 2,
     'num_units': 512,
 #    'override_loaded_hparams': True,

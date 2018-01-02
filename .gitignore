@@ -119,3 +119,4 @@ best_bleu/
 
 # tensorflow
 translate.ckpt*
+!translate.ckpt-2784* # reddit chatbot inference graph

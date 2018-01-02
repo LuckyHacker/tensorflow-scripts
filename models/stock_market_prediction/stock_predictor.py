@@ -10,18 +10,14 @@ from simulation import StockTradingSimulation
 
 outfile = "prediction.png"
 outfolder = "output"
-<<<<<<< HEAD
-stock = "ABT"
-=======
 stock = "OUT1V.HE"
->>>>>>> f20de2d49879e428b51d3eb7d6270089765a2d1b
 infile = "{}_alltargets.csv".format(stock)
 infolder = "stock" # ("stock" / "currency")
 
 learning_rate = 0.001
 num_epochs = 10
 batch_size = 1
-train_size = 0.9
+train_size = 0.90
 truncated_backprop_length = 1
 state_size = 8
 num_features = 4
